@@ -31,6 +31,7 @@
             ?>
           </div>
         </section>
+        <!-- /.gg -->
         <!-- /.content -->
         <div class="modal fade" id="confirm_modal" role='dialog'>
     <div class="modal-dialog modal-md modal-dialog-centered" role="document">

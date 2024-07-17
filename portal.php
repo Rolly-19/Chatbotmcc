@@ -1,6 +1,6 @@
 <style>
 	#chat_convo {
-		max-height: 65vh;
+		max-height: 100vh; /* Increased height */
 		background-color: #f0f0f0; /* Fallback background color */
 		background-image: url('wave.png'); /* Path to your background image */
 		background-size: cover; /* Cover the entire area */
@@ -9,7 +9,7 @@
 		color: #333333; /* Adjust text color for better readability */
 	}
 	#chat_convo .direct-chat-messages {
-		min-height: 250px;
+		min-height: 350px; /* Increased height */
 		height: inherit;
 		background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent background for better text readability */
 		border-radius: 10px; /* Optional: rounded corners */
@@ -81,7 +81,7 @@
 
 <div class="container-fluid">
 	<div class="row">
-		<div class="col-lg-8 <?php echo isMobileDevice() == false ?  "offset-2" : '' ?>">
+		<div class="col-lg-10 <?php echo isMobileDevice() == false ?  "offset-1" : '' ?>">
 			<div class="card direct-chat direct-chat-primary" id="chat_convo">
 				<div class="card-header ui-sortable-handle" style="cursor: move;">
 					<h3 class="card-title">Ask Me</h3>
@@ -197,4 +197,3 @@
 		});
 	})
 </script>
-

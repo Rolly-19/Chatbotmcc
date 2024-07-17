@@ -1,0 +1,13 @@
+{
+    "name": "rolly/chatbot",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "require": {
+        "ramsey/uuid": "^4.7",
+        "phpmailer/phpmailer": "^6.9"
+    }
+}

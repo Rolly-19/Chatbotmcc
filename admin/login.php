@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en" class="" style="height: auto;">
  <?php require_once('inc/header.php') ?>
-<body class="hold-transition login-page" style="background-image: url('ccm1.png'); background-size: cover; background-position: center;">
+<body class="hold-transition login-page" style="background-image: url('wave.png'); background-size: cover; background-position: center;">
   <script>
     start_loader()
   </script>
@@ -10,6 +10,7 @@
   <!-- /.login-logo -->
   <div class="card card-outline card-primary">
     <div class="card-header text-center">
+      <img src="logo.png" alt="Logo" class="login-logo">
       <a href="./" class="h1"><b>Login</b></a>
     </div>
     <div class="card-body">
@@ -71,5 +72,14 @@
     });
   });
 </script>
+
+<style>
+  .login-logo {
+    width: 100px; /* Adjust the width as needed */
+    margin-bottom: 5px; /* Adjust the spacing as needed */
+    margin-top: 5px;
+  }
+</style>
+
 </body>
 </html>

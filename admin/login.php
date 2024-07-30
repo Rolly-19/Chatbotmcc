@@ -29,13 +29,9 @@
           <input type="password" class="form-control" name="password" id="password" placeholder="Password">
           <div class="input-group-append">
             <div class="input-group-text">
-              <span class="fas fa-lock"></span>
+              <span id="toggle-password" class="fas fa-eye"></span>
             </div>
           </div>
-        </div>
-        <div class="input-group mb-3">
-          <input type="checkbox" id="show-password">
-          <label for="show-password" style="margin-left: 5px; margin-top: 5px;">Show Password</label>
         </div>
         <div class="row">
           <div class="col-6">
@@ -61,13 +57,15 @@
   $(document).ready(function(){
     end_loader();
     
-    $('#show-password').on('change', function(){
+    $('#toggle-password').click(function(){
       var passwordField = $('#password');
       var passwordFieldType = passwordField.attr('type');
-      if ($(this).is(':checked')) {
+      if (passwordFieldType === 'password') {
         passwordField.attr('type', 'text');
+        $(this).removeClass('fa-eye').addClass('fa-eye-slash');
       } else {
         passwordField.attr('type', 'password');
+        $(this).removeClass('fa-eye-slash').addClass('fa-eye');
       }
     });
   });
@@ -79,7 +77,12 @@
     margin-bottom: 5px; /* Adjust the spacing as needed */
     margin-top: 5px;
   }
+  #toggle-password {
+    font-size: .8rem; /* Adjust the size as needed (1.5rem is just an example) */
+    cursor: pointer; /* Change cursor to pointer for better UX */
+  }
 </style>
+
 
 </body>
 </html>

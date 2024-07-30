@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en" class="" style="height: auto;">
  <?php require_once('inc/header.php') ?>
-<body class="hold-transition login-page" style="background-image: url('ccm.png'); background-size: cover; background-position: center;">
+<body class="hold-transition login-page" style="background-image: url('ccm1.png'); background-size: cover; background-position: center;">
   <script>
     start_loader()
   </script>

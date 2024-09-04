@@ -6,7 +6,7 @@ FIRST Download
 
 2."TEXT EDITOR" NOTEPAD++ OR SUBLIME TEXT 3 / ETC.
 
-3"chatbot1"
+3"chatbot"
 
 4. Download the zip file/ download winrar
 

@@ -221,10 +221,10 @@
 						resp = JSON.parse(resp)
 						if (resp.status == 'success') {
 							console.log(resp)
-							if (resp.message == `I&apos;m sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
+							// if (resp.message == `I&apos;m sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
 								// with the aibot
 								$.ajax({
-									url: "https://mccchat.com:3000/ask",
+									url: _base_url_ + "ask",
 									type: 'POST',
 									contentType: 'application/json',
 									data: JSON.stringify(requestData),
@@ -250,18 +250,18 @@
 										$('#response').text('An error occurred');
 									}
 								});
-							} else {
-								setTimeout(() => {
-									// with the database data result
-									var bot_chat = $('#bot_chat').clone();
-									bot_chat.find('.direct-chat-text').html(resp.message);
-									$('#chat_convo .direct-chat-messages').append(bot_chat.html());
-									$("#chat_convo .card-body").animate({
-										scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
-									}, "fast");
-									$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
-								}, 2000)
-							}
+							// } else {
+							// 	setTimeout(() => {
+							// 		// with the database data result
+							// 		var bot_chat = $('#bot_chat').clone();
+							// 		bot_chat.find('.direct-chat-text').html(resp.message);
+							// 		$('#chat_convo .direct-chat-messages').append(bot_chat.html());
+							// 		$("#chat_convo .card-body").animate({
+							// 			scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+							// 		}, "fast");
+							// 		$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
+							// 	}, 2000)
+							// }
 						}
 					}
 				}

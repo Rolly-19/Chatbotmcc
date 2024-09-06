@@ -220,6 +220,7 @@
 					if (resp) {
 						resp = JSON.parse(resp)
 						if (resp.status == 'success') {
+							console.log(resp)
 							if (resp.message == `I &apos;m sorry. I can't understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)`) {
 								// with the aibot
 								$.ajax({

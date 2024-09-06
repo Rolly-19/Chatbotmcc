@@ -221,7 +221,7 @@
 						resp = JSON.parse(resp)
 						if (resp.status == 'success') {
 							console.log(resp)
-							if (resp.message == `I &apos;m sorry. I can't understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)`) {
+							if (resp.message == `I&apos;m sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
 								// with the aibot
 								$.ajax({
 									url: _base_url_ + "ask",

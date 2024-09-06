@@ -1,58 +1,86 @@
 <style>
 	#chat_convo {
-		max-height: 100vh; /* Increased height */
-		background-color: #f0f0f0; /* Fallback background color */
-		background-image: url('wave.png'); /* Path to your background image */
-		background-size: cover; /* Cover the entire area */
-		background-position: center; /* Center the image */
-		background-repeat: no-repeat; /* Do not repeat the image */
-		color: #333333; /* Adjust text color for better readability */
+		max-height: 100vh;
+		/* Increased height */
+		background-color: #f0f0f0;
+		/* Fallback background color */
+		background-image: url('wave.png');
+		/* Path to your background image */
+		background-size: cover;
+		/* Cover the entire area */
+		background-position: center;
+		/* Center the image */
+		background-repeat: no-repeat;
+		/* Do not repeat the image */
+		color: #333333;
+		/* Adjust text color for better readability */
 	}
+
 	#chat_convo .direct-chat-messages {
-		min-height: 350px; /* Increased height */
+		min-height: 350px;
+		/* Increased height */
 		height: inherit;
-		background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent background for better text readability */
-		border-radius: 10px; /* Optional: rounded corners */
-		padding: 10px; /* Optional: add some padding */
+		background-color: rgba(255, 255, 255, 0.8);
+		/* Slightly transparent background for better text readability */
+		border-radius: 10px;
+		/* Optional: rounded corners */
+		padding: 10px;
+		/* Optional: add some padding */
+
 	}
-	.direct-chat-primary .right > .direct-chat-text {
+
+	.direct-chat-primary .right>.direct-chat-text {
 		border-color: #d2d6de;
 		color: #fff;
 	}
+
 	.direct-chat-msg .direct-chat-text {
-		background-color: #ffffff; /* Chat bubble background color */
-		color: #333333; /* Chat text color */
+		background-color: #ffffff;
+		/* Chat bubble background color */
+		color: #333333;
+		/* Chat text color */
 		border-radius: 10px;
 		padding: 10px;
 	}
+
 	.direct-chat-msg.right .direct-chat-text {
 		background-color: #ffffff;
 		color: #333333;
 		border-radius: 10px;
 		padding: 10px;
 	}
+
 	.direct-chat-msg img {
-		border: 1px solid red; /* Red border */
+		border: 1px solid red;
+		/* Red border */
 	}
 
 	.card-footer {
-		background-color: #e9ecef; /* Input area background color */
+		background-color: #e9ecef;
+		/* Input area background color */
 	}
+
 	.input-group textarea {
 		border: 1px solid #ced4da;
 		color: #495057;
 	}
+
 	.input-group textarea::placeholder {
-		color: #6c757d; /* Input placeholder text color */
+		color: #6c757d;
+		/* Input placeholder text color */
 	}
+
 	.input-group-append .btn-primary {
-		background-color: red; /* Send button background color */
+		background-color: red;
+		/* Send button background color */
 		border-color: red;
 	}
+
 	.typing-indicator {
 		display: flex;
 		align-items: center;
 	}
+
 	.typing-indicator span {
 		display: inline-block;
 		width: 8px;
@@ -63,16 +91,23 @@
 		opacity: 0.6;
 		animation: typing 1.5s infinite;
 	}
+
 	.typing-indicator span:nth-child(2) {
 		animation-delay: 0.2s;
 	}
+
 	.typing-indicator span:nth-child(3) {
 		animation-delay: 0.4s;
 	}
+
 	@keyframes typing {
-		0%, 60%, 100% {
+
+		0%,
+		60%,
+		100% {
 			transform: translateY(0);
 		}
+
 		30% {
 			transform: translateY(-8px);
 		}
@@ -140,51 +175,106 @@
 	</div>
 </div>
 <script type="text/javascript">
-	$(document).ready(function(){
-		$('[name="message"]').keypress(function(e){
-			if(e.which === 13 && e.originalEvent.shiftKey == false){
+	$(document).ready(function() {
+		$('[name="message"]').keypress(function(e) {
+			if (e.which === 13 && e.originalEvent.shiftKey == false) {
 				$('#send_chat').submit()
 				return false;
 			}
 		});
-		$('#send_chat').submit(function(e){
+		$('#send_chat').submit(function(e) {
 			e.preventDefault();
 			var message = $('[name="message"]').val();
-			if(message == '' || message == null) return false;
+			if (message == '' || message == null) return false;
 			var uchat = $('#user_chat').clone();
 			uchat.find('.direct-chat-text').html(message);
 			$('#chat_convo .direct-chat-messages').append(uchat.html());
 			$('[name="message"]').val('')
-			$("#chat_convo .card-body").animate({ scrollTop: $("#chat_convo .card-body").prop('scrollHeight') }, "fast");
+			$("#chat_convo .card-body").animate({
+				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+			}, "fast");
 
 			var typingIndicator = $('#typing_indicator').clone();
 			$('#chat_convo .direct-chat-messages').append(typingIndicator.html());
-			$("#chat_convo .card-body").animate({ scrollTop: $("#chat_convo .card-body").prop('scrollHeight') }, "fast");
+			$("#chat_convo .card-body").animate({
+				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+			}, "fast");
 
-			setTimeout(function() {
-				$.ajax({
-					url:_base_url_+"classes/Master.php?f=get_response",
-					method:'POST',
-					data:{message:message},
-					error: err=>{
-						console.log(err)
-						alert_toast("An error occured.",'error');
-						end_loader();
-					},
-					success:function(resp){
-						$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
-						if(resp){
-							resp = JSON.parse(resp)
-							if(resp.status == 'success'){
-								var bot_chat = $('#bot_chat').clone();
+			const requestData = {
+				message: message
+			};
+
+			// with the database
+			$.ajax({
+				url: "classes/Master.php?f=get_response",
+				method: 'POST',
+				data: {
+					message: message
+				},
+				error: err => {
+					console.log(err)
+					alert_toast("An error occured.", 'error');
+					end_loader();
+				},
+				success: function(resp) {
+					if (resp) {
+						resp = JSON.parse(resp)
+						if (resp.status == 'success') {
+							if (resp.message == `I am sorry. I can't understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)`) {
+								// with the aibot
+								$.ajax({
+									url: _base_url_ + "ask",
+									type: 'POST',
+									contentType: 'application/json',
+									data: JSON.stringify(requestData),
+									success: function(data) {
+										var cleanedText;
+										if (data && data.text) {
+											// Convert the response text into a JSON string with formatting
+											var msgData = data.text;
+											cleanedText = removeOuterQuotes(msgData);
+										}
+										setTimeout(() => {
+											var bot_chat = $('#bot_chat').clone();
+											bot_chat.find('.direct-chat-text').html(cleanedText);
+											$('#chat_convo .direct-chat-messages').append(bot_chat.html());
+											$("#chat_convo .card-body").animate({
+												scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+											}, "fast");
+											$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
+										}, 1000)
+									},
+									error: function(xhr, status, error) {
+										console.error('Error:', error);
+										$('#response').text('An error occurred');
+									}
+								});
+							} else {
+								setTimeout(() => {
+									// with the database data result
+									var bot_chat = $('#bot_chat').clone();
 									bot_chat.find('.direct-chat-text').html(resp.message);
 									$('#chat_convo .direct-chat-messages').append(bot_chat.html());
-									$("#chat_convo .card-body").animate({ scrollTop: $("#chat_convo .card-body").prop('scrollHeight') }, "fast");
+									$("#chat_convo .card-body").animate({
+										scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+									}, "fast");
+									$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
+								}, 2000)
 							}
 						}
 					}
-				});
-			}, 3000); // 3 seconds delay
+				}
+			});
+			// Function to remove only the first and last quote
+			function removeOuterQuotes(text) {
+				// Check if the text starts and ends with a quote
+				if (text.startsWith('"') && text.endsWith('"')) {
+					return text.slice(1, -1); // Remove the first and last character
+				}
+				return text; // Return text as is if no outer quotes
+			};
+
+
 		});
 		$('#reset-convo').click(function() {
 			$('.direct-chat-messages').empty();

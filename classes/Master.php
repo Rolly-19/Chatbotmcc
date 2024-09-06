@@ -14,13 +14,14 @@ Class Master extends DBConnection {
 	public function save_response(){
 		extract($_POST);
 		if(!empty($id)){
-			$del = $this->conn->query("DELETE FROM `questions` where id= '$id' ");
+			$del = $this->conn->query("DELETE FROM `questions` where id= '".$this->conn->real_escape_string($id)."' ");
 			if(!$del){
 				return 2;
 				exit;
 			}
 		}
 		$data = "";
+		$response_message = $this->conn->real_escape_string($response_message);
 		$ins_resp = $this->conn->query("INSERT INTO `responses` set response_message = '{$response_message}' ");
 		if(!$ins_resp){
 			return 2;
@@ -29,10 +30,17 @@ Class Master extends DBConnection {
 		$resp_id = $this->conn->insert_id;
 
 		foreach($question as $k => $v){
+			$question[$k] = $this->conn->real_escape_string($v);
 			$data = " response_id = {$resp_id} ";
-			$data .= ", `question` = '$question[$k]' ";
+			$data .= ", `question` = '{$question[$k]}' ";
 			$ins[] = $this->conn->query("INSERT INTO `questions` set $data ");
 		}
+
+		// Remove from unanswered questions
+		foreach($question as $k => $v){
+			$this->conn->query("DELETE FROM `unanswered` where question = '{$question[$k]}' ");
+		}
+
 		if(isset($ins) && count($ins) == count($question)){
 			$this->settings->set_flashdata("success"," Data successfully saved");
 			return 1;
@@ -40,22 +48,23 @@ Class Master extends DBConnection {
 			return 2;
 			exit;
 		}
-
 	}
 	public function delete_response(){
 		extract($_POST);
-		 $del = $this->conn->query("DELETE FROM `questions` where id = $id");
-		 if($del){
+		$id = $this->conn->real_escape_string($id);
+		$del = $this->conn->query("DELETE FROM `questions` where id = '{$id}' ");
+		if($del){
 			$this->settings->set_flashdata("success"," Data successfully deleted");
-		 	return 1;
-		 }else{
-		 	$this->conn->error;
-		 }
+			return 1;
+		}else{
+			$this->conn->error;
+		}
 	}
 
 	public function get_response(){
 		extract($_POST);
 		$message = str_replace(array("?"), '', $message);
+		$message = $this->conn->real_escape_string($message);
 		$not_question = array("what", "what is","who","who is", "where");
 		if(in_array($message,$not_question)){
 			$resp['status'] = "success";
@@ -67,7 +76,6 @@ Class Master extends DBConnection {
 		$qry = $this->conn->query($sql);
 		if($qry->num_rows > 0){
 			$result = $qry->fetch_array();
-			// var_dump($result);
 			$resp['status'] = "success";
 			$resp['message'] = $result['response_message'];
 			$resp['sql'] = $sql;
@@ -78,22 +86,24 @@ Class Master extends DBConnection {
 			$resp['message'] = $this->settings->info('no_result');
 			$chk = $this->conn->query("SELECT * FROM `unanswered` where `question` = '{$message}' ");
 			if($chk->num_rows > 0){
-				$this->conn->query("UPDATE `unanswered` set no_asks = no_asks + 1 ");
+				$this->conn->query("UPDATE `unanswered` set no_asks = no_asks + 1 WHERE question = '{$message}' ");
 			}else{
-				$this->conn->query("INSERT INTO `unanswered` set question = '{$message}' ");
+				$this->conn->query("INSERT INTO `unanswered` set question = '{$message}', no_asks = 1 ");
 			}
+			
 			return json_encode($resp);
 		}
 	}
 	public function delete_unanswer(){
 		extract($_POST);
-		 $del = $this->conn->query("DELETE FROM `unanswered` where id = $id");
-		 if($del){
+		$id = $this->conn->real_escape_string($id);
+		$del = $this->conn->query("DELETE FROM `unanswered` where id = '{$id}' ");
+		if($del){
 			$this->settings->set_flashdata("success"," Data successfully deleted");
-		 	return 1;
-		 }else{
-		 	$this->conn->error;
-		 }
+			return 1;
+		}else{
+			$this->conn->error;
+		}
 	}
 }
 
@@ -117,3 +127,4 @@ switch ($action) {
 		// echo $sysset->index();
 		break;
 }
+?>

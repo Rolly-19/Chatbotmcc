@@ -2,6 +2,26 @@
  .sidebar li.nav-item * {
   color: black; /* Changed text color to black */
 }
+.main-sidebar {
+  background-image: url('wave.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.brand-link {
+  background-image: url('wave.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.nav-sidebar .nav-link.active {
+  background: none !important; /* Remove background image */
+  color: white !important; /* Changed text color to white */
+}
+
+.nav-sidebar .nav-link:hover {
+  background-size: cover !important;
+  background-position: center !important;
+  color: black !important; /* Changed text color to black */
+}
 .brand-link .brand-text {
   color: black !important; /* Changed text color to black */
 }

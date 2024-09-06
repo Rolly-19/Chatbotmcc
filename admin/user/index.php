@@ -29,8 +29,13 @@ foreach($user->fetch_array() as $k =>$v){
 				</div>
 				<div class="form-group">
 					<label for="password">Password</label>
-					<input type="password" name="password" id="password" class="form-control" value="" autocomplete="off">
-					<small><i>Leave this blank if you dont want to change the password.</i></small>
+					<div class="input-group">
+						<input type="password" name="password" id="password" class="form-control" value="" autocomplete="off">
+						<div class="input-group-append">
+							<span class="input-group-text" id="toggle-password"><i class="fa fa-eye"></i></span>
+						</div>
+					</div>
+					<small><i>Leave this blank if you don't want to change the password.</i></small>
 				</div>
 				<div class="form-group">
 					<label for="" class="control-label">Avatar</label>
@@ -72,6 +77,15 @@ foreach($user->fetch_array() as $k =>$v){
 	        reader.readAsDataURL(input.files[0]);
 	    }
 	}
+
+	$('#toggle-password').click(function(){
+		const passwordField = $('#password');
+		const passwordFieldType = passwordField.attr('type');
+		const newType = passwordFieldType === 'password' ? 'text' : 'password';
+		passwordField.attr('type', newType);
+		$(this).find('i').toggleClass('fa-eye fa-eye-slash');
+	});
+
 	$('#manage-user').submit(function(e){
 		e.preventDefault();
 		start_loader()
@@ -93,5 +107,4 @@ foreach($user->fetch_array() as $k =>$v){
 			}
 		})
 	})
-
 </script>

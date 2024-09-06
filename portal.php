@@ -224,7 +224,7 @@
 							if (resp.message == `I&apos;m sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
 								// with the aibot
 								$.ajax({
-									url: _base_url_ + "ask",
+									url: _base_url_ + ":3000/ask",
 									type: 'POST',
 									contentType: 'application/json',
 									data: JSON.stringify(requestData),

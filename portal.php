@@ -206,7 +206,7 @@
 
 			// with the database
 			$.ajax({
-				url: "classes/Master.php?f=get_response",
+				url: base_url +  "classes/Master.php?f=get_response",
 				method: 'POST',
 				data: {
 					message: message

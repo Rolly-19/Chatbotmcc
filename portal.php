@@ -206,7 +206,7 @@
 
 			// with the database
 			$.ajax({
-				url: _base_url_ +  "classes/Master.php?f=get_response",
+				url:_base_url_ + "classes/Master.php?f=get_response",
 				method: 'POST',
 				data: {
 					message: message
@@ -217,14 +217,14 @@
 					end_loader();
 				},
 				success: function(resp) {
+					console.log(resp)
 					if (resp) {
 						resp = JSON.parse(resp)
 						if (resp.status == 'success') {
-							console.log(resp)
-							// if (resp.message == `I&apos;m sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
+							if (resp.message == `I&apos;m sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
 								// with the aibot
 								$.ajax({
-									url: _base_url_ + "ask",
+									url:"https://mccchat.com/ask",
 									type: 'POST',
 									contentType: 'application/json',
 									data: JSON.stringify(requestData),
@@ -250,18 +250,18 @@
 										$('#response').text('An error occurred');
 									}
 								});
-							// } else {
-							// 	setTimeout(() => {
-							// 		// with the database data result
-							// 		var bot_chat = $('#bot_chat').clone();
-							// 		bot_chat.find('.direct-chat-text').html(resp.message);
-							// 		$('#chat_convo .direct-chat-messages').append(bot_chat.html());
-							// 		$("#chat_convo .card-body").animate({
-							// 			scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
-							// 		}, "fast");
-							// 		$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
-							// 	}, 2000)
-							// }
+							} else {
+								setTimeout(() => {
+									// with the database data result
+									var bot_chat = $('#bot_chat').clone();
+									bot_chat.find('.direct-chat-text').html(resp.message);
+									$('#chat_convo .direct-chat-messages').append(bot_chat.html());
+									$("#chat_convo .card-body").animate({
+										scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+									}, "fast");
+									$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
+								}, 2000)
+							}
 						}
 					}
 				}

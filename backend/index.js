@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 
+console.log(process.env.COHERE_API_KEY)
 const app = express();
 const port = 3000;
 

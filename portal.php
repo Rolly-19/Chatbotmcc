@@ -233,16 +233,20 @@
 									type: 'POST',
 									contentType: 'application/json',
 									data: JSON.stringify(requestData),
-									success: function(data) {
-										var cleanedText;
+									success: function(response) {
+										var data;
+										var msgData;
 										var formattedText;
+										if(data && data.text){
+											data = JSON.parse(response);
+										}
 											// Convert the response text into a JSON string with formatting
-											var msgData = replaceNewlinesWithBr(data.text);
-											cleanedText = removeOuterQuotes(msgData);
+											var removenextline = replaceNewlinesWithBr(data.text);
+											msgData = removeOuterQuotes(msgData);
 										
 										setTimeout(() => {
 											var bot_chat = $('#bot_chat').clone();
-											bot_chat.find('.direct-chat-text').html(cleanedText);
+											bot_chat.find('.direct-chat-text').html(msgData);
 											$('#chat_convo .direct-chat-messages').append(bot_chat.html());
 											$("#chat_convo .card-body").animate({
 												scrollTop: $("#chat_convo .card-body").prop('scrollHeight')

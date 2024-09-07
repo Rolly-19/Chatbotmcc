@@ -236,11 +236,10 @@
 									success: function(data) {
 										var cleanedText;
 										var formattedText;
-										if (data && data.text) {
 											// Convert the response text into a JSON string with formatting
 											var msgData = replaceNewlinesWithBr(data.text);
 											cleanedText = removeOuterQuotes(msgData);
-										}
+										
 										setTimeout(() => {
 											var bot_chat = $('#bot_chat').clone();
 											bot_chat.find('.direct-chat-text').html(cleanedText);

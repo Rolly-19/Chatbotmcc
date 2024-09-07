@@ -200,6 +200,11 @@
 				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
 			}, "fast");
 
+			// Function to replace newline characters with <br> tags
+			function replaceNewlinesWithBr(text) {
+				return text.replace(/\n/g, '<br>');
+			}
+
 			const requestData = {
 				message: message
 			};
@@ -224,15 +229,16 @@
 							if (resp.message == `I&apos;m sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
 								// with the aibot
 								$.ajax({
-									url:"https://mccchat.com/ask",
+									url:_base_url_ + "classes/api_handler.php",
 									type: 'POST',
 									contentType: 'application/json',
 									data: JSON.stringify(requestData),
 									success: function(data) {
 										var cleanedText;
+										var formattedText;
 										if (data && data.text) {
 											// Convert the response text into a JSON string with formatting
-											var msgData = data.text;
+											var msgData = replaceNewlinesWithBr(data.text);
 											cleanedText = removeOuterQuotes(msgData);
 										}
 										setTimeout(() => {

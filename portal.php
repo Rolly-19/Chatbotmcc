@@ -226,7 +226,7 @@
 					if (resp) {
 						resp = JSON.parse(resp)
 						if (resp.status == 'success') {
-							if (resp.message == `I&apos;m sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
+							if (resp.message == `I'm sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
 								// with the aibot
 								$.ajax({
 									url:_base_url_ + "classes/api_handler.php",

@@ -234,15 +234,19 @@
 									contentType: 'application/json',
 									data: JSON.stringify(requestData),
 									success: function(response) {
-										var data;
-										var msgData;
-										var formattedText;
-										if(data && data.text){
+										let data;
+										try {
 											data = JSON.parse(response);
+										} catch (e) {
+											console.error('Error parsing response:', e);
+											return;
 										}
-											// Convert the response text into a JSON string with formatting
-											var removenextline = replaceNewlinesWithBr(data.text);
-											msgData = removeOuterQuotes(msgData);
+
+										let msgData = '';
+										let formatedText = replaceNewlinesWithBr(data.text);
+										if (data && data.text) {
+											msgData = removeOuterQuotes(formatedText); // Clean the text
+										}
 										
 										setTimeout(() => {
 											var bot_chat = $('#bot_chat').clone();

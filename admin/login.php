@@ -18,7 +18,7 @@
 
       <form id="login-frm" action="" method="post">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" name="username" placeholder="Username">
+          <input type="email" class="form-control" name="username" placeholder="Email">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>
@@ -33,6 +33,7 @@
             </div>
           </div>
         </div>
+        <a style="float:left;" href="forgot-password.php">Forgot Password </a>
         <div class="row">
           <div class="col-6">
             <a href="<?php echo base_url ?>">Go to Website</a>

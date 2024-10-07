@@ -143,7 +143,7 @@
 				<div class="card-footer">
 					<form id="send_chat" method="post">
 						<div class="input-group">
-							<textarea type="text" name="message" placeholder="Type Message ..." class="form-control" required=""></textarea>
+							<textarea type="text" name="message" placeholder="Type Message ..." class="form-control" required></textarea>
 							<span class="input-group-append">
 								<button type="submit" class="btn btn-primary">Send</button>
 							</span>

@@ -16,11 +16,15 @@ if($email == false){
     <style>
         html, body {
             height: 100%;
-            background-color: #faf9f6;
+            background-image: url('wave.png'); /* Update with your image path */
+            background-size: cover; /* Ensure the image covers the entire background */
+            background-position: center; /* Center the image */
         }
         .verification-container {
             max-width: 400px;
             width: 90%;
+            background-color: rgba(255, 255, 255, 0.9); /* Optional: Add some transparency */
+            border-radius: 10px; /* Optional: Add border radius */
         }
         .btn-danger {
             background-color: #fd2323;
@@ -29,42 +33,45 @@ if($email == false){
             background-color: #f71d1d;
         }
         .start-end {
-            text-align: right;
+            text-align: center; /* Center align the logo */
+            margin-bottom: 20px; /* Add some space below the logo */
         }
     </style>
 </head>
 <body class="d-flex align-items-center justify-content-center">
-    <div class="verification-container bg-white p-4 rounded shadow">
-        <div class="start-end"> <img src="logo.png" width="80" height="80"></div>
+    <div class="verification-container p-4 rounded shadow">
+        <div class="start-end">
+            <img src="logo.png" width="80" height="80" alt="Logo">
+        </div>
         <h2 class="text-center mb-3">Enter OTP</h2>
-        <p class="text-center mb-4">Enter the otp sent to your email.</p>
+        <p class="text-center mb-4">Enter the OTP sent to your email.</p>
         <?php 
-                    if(isset($_SESSION['info'])){
-                        ?>
-                     <div class="alert alert-success text-center" style="padding: 0.4rem 0.4rem">
-                         <?php echo $_SESSION['info']; ?>
-                     </div>
-                     <?php
-                    }
-                    ?>
-                     <?php
-                    if(count($errors) > 0){
-                        ?>
-                     <div class="alert alert-danger text-center">
-                         <?php
-                            foreach($errors as $showerror){
-                                echo $showerror;
-                            }
-                            ?>
-                     </div>
-                     <?php
-                    }
-                    ?>
+        if(isset($_SESSION['info'])){
+            ?>
+            <div class="alert alert-success text-center" style="padding: 0.4rem 0.4rem">
+                <?php echo $_SESSION['info']; ?>
+            </div>
+            <?php
+        }
+        ?>
+        <?php
+        if(count($errors) > 0){
+            ?>
+            <div class="alert alert-danger text-center">
+                <?php
+                foreach($errors as $showerror){
+                    echo $showerror;
+                }
+                ?>
+            </div>
+            <?php
+        }
+        ?>
         <form action="reset-code.php" method="POST" autocomplete="off">
             <div class="mb-3">
-                <input type="text" name="otp" class="form-control" placeholder="Enter otp code" required>
+                <input type="text" name="otp" class="form-control" placeholder="Enter OTP code" required>
             </div>
-            <button type="submit" name="check-reset-otp"  class="btn btn-danger w-100 mb-3"> Submit</button>
+            <button type="submit" name="check-reset-otp" class="btn btn-danger w-100 mb-3">Submit</button>
             <p class="text-center mb-0">Didn’t receive a code? <a href="forgot-password.php" class="text-danger">Resend Code</a></p>
         </form>
     </div>

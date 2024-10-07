@@ -1,13 +1,12 @@
 <?php require_once('../config.php') ?>
 <!DOCTYPE html>
-<html lang="en" class="" style="height: auto;">
- <?php require_once('inc/header.php') ?>
+<html lang="en">
+<?php require_once('inc/header.php') ?>
 <body class="hold-transition login-page" style="background-image: url('wave.png'); background-size: cover; background-position: center;">
   <script>
     start_loader()
   </script>
-<div class="login-box" >
-  <!-- /.login-logo -->
+<div class="login-box">
   <div class="card card-outline card-primary">
     <div class="card-header text-center">
       <img src="logo.png" alt="Logo" class="login-logo">
@@ -33,10 +32,14 @@
             </div>
           </div>
         </div>
-        <a style="float:left;" href="forgot-password.php">Forgot Password </a>
+        <div class="row">
+          <div class="col-12">
+            <a href="forgot-password.php" class="text-left">Forgot Password?</a>
+          </div>
+        </div>
         <div class="row">
           <div class="col-6">
-            <a href="<?php echo base_url ?>">Go to Website</a>
+            <a href="<?php echo base_url ?>" class="btn btn-link">Go to Website</a>
           </div>
           <div class="col-6 text-right">
             <button type="submit" class="btn btn-primary">Sign In</button>
@@ -79,11 +82,18 @@
     margin-top: 5px;
   }
   #toggle-password {
-    font-size: .8rem; /* Adjust the size as needed (1.5rem is just an example) */
+    font-size: .8rem; /* Adjust the size as needed */
     cursor: pointer; /* Change cursor to pointer for better UX */
   }
+  .btn-link {
+    color: #007bff; /* Bootstrap primary link color */
+    text-decoration: none;
+    padding: 0; /* Remove padding for a cleaner look */
+  }
+  .btn-link:hover {
+    text-decoration: underline; /* Underline on hover for better UX */
+  }
 </style>
-
 
 </body>
 </html>

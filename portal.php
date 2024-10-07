@@ -1,93 +1,122 @@
-<?php
-// Check if session is not already started
-if (session_status() === PHP_SESSION_NONE) {
-    // Secure session cookie settings before starting the session
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => '', // Set your domain
-        'secure' => true, // Use only if HTTPS is enabled
-        'httponly' => true,
-        'samesite' => 'Strict' // or 'Lax', depending on your needs
-    ]);
-    session_start(); // Start the session
-}
-
-// Generate CSRF token if it does not exist
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-?>
-
 <style>
-    #chat_convo {
-        max-height: 100vh;
-        background-color: #f0f0f0;
-        background-image: url('wave.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        color: #333333;
-    }
+	#chat_convo {
+		max-height: 100vh;
+		/* Increased height */
+		background-color: #f0f0f0;
+		/* Fallback background color */
+		background-image: url('wave.png');
+		/* Path to your background image */
+		background-size: cover;
+		/* Cover the entire area */
+		background-position: center;
+		/* Center the image */
+		background-repeat: no-repeat;
+		/* Do not repeat the image */
+		color: #333333;
+		/* Adjust text color for better readability */
+	}
 
-    #chat_convo .direct-chat-messages {
-        min-height: 350px;
-        height: inherit;
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 10px;
-        padding: 10px;
-    }
+	#chat_convo .direct-chat-messages {
+		min-height: 350px;
+		/* Increased height */
+		height: inherit;
+		background-color: rgba(255, 255, 255, 0.8);
+		/* Slightly transparent background for better text readability */
+		border-radius: 10px;
+		/* Optional: rounded corners */
+		padding: 10px;
+		/* Optional: add some padding */
 
-    .direct-chat-msg .direct-chat-text {
-        background-color: #ffffff;
-        color: #333333;
-        border-radius: 10px;
-        padding: 10px;
-    }
+	}
 
-    .card-footer {
-        background-color: #e9ecef;
-    }
+	.direct-chat-primary .right>.direct-chat-text {
+		border-color: #d2d6de;
+		color: #fff;
+	}
 
-    .input-group textarea {
-        border: 1px solid #ced4da;
-        color: #495057;
-    }
+	.direct-chat-msg .direct-chat-text {
+		background-color: #ffffff;
+		/* Chat bubble background color */
+		color: #333333;
+		/* Chat text color */
+		border-radius: 10px;
+		padding: 10px;
+	}
 
-    .input-group textarea::placeholder {
-        color: #6c757d;
-    }
+	.direct-chat-msg.right .direct-chat-text {
+		background-color: #ffffff;
+		color: #333333;
+		border-radius: 10px;
+		padding: 10px;
+	}
 
-    .input-group-append .btn-primary {
-        background-color: red;
-        border-color: red;
-    }
+	.direct-chat-msg img {
+		border: 1px solid red;
+		/* Red border */
+	}
 
-    .typing-indicator {
-        display: flex;
-        align-items: center;
-    }
+	.card-footer {
+		background-color: #e9ecef;
+		/* Input area background color */
+	}
 
-    .typing-indicator span {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        margin: 0 2px;
-        background-color: #999;
-        border-radius: 50%;
-        opacity: 0.6;
-        animation: typing 1.5s infinite;
-    }
+	.input-group textarea {
+		border: 1px solid #ced4da;
+		color: #495057;
+	}
 
-    @keyframes typing {
-        0%, 60%, 100% { transform: translateY(0); }
-        30% { transform: translateY(-8px); }
-    }
+	.input-group textarea::placeholder {
+		color: #6c757d;
+		/* Input placeholder text color */
+	}
+
+	.input-group-append .btn-primary {
+		background-color: red;
+		/* Send button background color */
+		border-color: red;
+	}
+
+	.typing-indicator {
+		display: flex;
+		align-items: center;
+	}
+
+	.typing-indicator span {
+		display: inline-block;
+		width: 8px;
+		height: 8px;
+		margin: 0 2px;
+		background-color: #999;
+		border-radius: 50%;
+		opacity: 0.6;
+		animation: typing 1.5s infinite;
+	}
+
+	.typing-indicator span:nth-child(2) {
+		animation-delay: 0.2s;
+	}
+
+	.typing-indicator span:nth-child(3) {
+		animation-delay: 0.4s;
+	}
+
+	@keyframes typing {
+
+		0%,
+		60%,
+		100% {
+			transform: translateY(0);
+		}
+
+		30% {
+			transform: translateY(-8px);
+		}
+	}
 </style>
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-10 <?php echo isMobileDevice() ? '' : 'offset-1'; ?>">
+        <div class="col-lg-10 <?php echo isMobileDevice() == false ? "offset-1" : ''; ?>">
             <div class="card direct-chat direct-chat-primary" id="chat_convo">
                 <div class="card-header ui-sortable-handle" style="cursor: move;">
                     <h3 class="card-title">Ask Me</h3>
@@ -109,10 +138,10 @@ if (empty($_SESSION['csrf_token'])) {
                             </div>
                         </div>
                     </div>
+                    <div class="end-convo"></div>
                 </div>
                 <div class="card-footer">
                     <form id="send_chat" method="post">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                         <div class="input-group">
                             <textarea name="message" placeholder="Type Message ..." class="form-control" required=""></textarea>
                             <span class="input-group-append">
@@ -126,7 +155,6 @@ if (empty($_SESSION['csrf_token'])) {
     </div>
 </div>
 
-<!-- User, Bot, Typing Indicators -->
 <div class="d-none" id="user_chat">
     <div class="direct-chat-msg right ml-4">
         <img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('user_avatar')); ?>" alt="message user image">
@@ -162,7 +190,7 @@ if (empty($_SESSION['csrf_token'])) {
         $('#send_chat').submit(function(e) {
             e.preventDefault();
             var message = $('[name="message"]').val().trim();
-            if (message === '' || message.length > 500) return;
+            if (message === '') return;
 
             // Sanitize message for display
             var sanitizedMessage = $('<div>').text(message).html();
@@ -181,10 +209,11 @@ if (empty($_SESSION['csrf_token'])) {
             $.ajax({
                 url: _base_url_ + "classes/Master.php?f=get_response",
                 method: 'POST',
-                data: $(this).serialize(),
+                data: { message: message },
                 error: function(err) {
                     console.log(err);
                     alert_toast("An error occurred.", 'error');
+                    end_loader();
                 },
                 success: function(resp) {
                     handleResponse(resp);
@@ -208,17 +237,13 @@ if (empty($_SESSION['csrf_token'])) {
         function handleResponse(resp) {
             console.log(resp);
             if (resp) {
-                try {
-                    resp = JSON.parse(resp);
-                    if (resp.status === 'success') {
-                        if (resp.message === `I'm sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
-                            handleAIResponse();
-                        } else {
-                            displayBotMessage(resp.message, 2000);
-                        }
+                resp = JSON.parse(resp);
+                if (resp.status === 'success') {
+                    if (resp.message === `I'm sorry, but the question you asked is not in my database yet. Please make sure your question is related to the school, try asking a different question, or check back later. Thank you!`) {
+                        handleAIResponse();
+                    } else {
+                        displayBotMessage(resp.message, 2000);
                     }
-                } catch (e) {
-                    console.error('Error parsing response:', e);
                 }
             }
         }

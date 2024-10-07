@@ -9,28 +9,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        html, body {
-            height: 100%;
-            background-color: #faf9f6;
-        }
-        .forgot-password-container {
-            max-width: 400px;
-            width: 90%;
-        }
-        .btn-danger {
-            background-color: #fd2323;
-        }
-        .btn-danger:hover {
-            background-color: #f71d1d;
-        }
-        .start-end {
-            text-align: right;
-        }
-    </style>
+    html, body {
+        height: 100%;
+        background-image: url('wave.png'); /* Update with your image path */
+        background-size: cover;
+        background-position: center;
+    }
+    .forgot-password-container {
+        max-width: 400px;
+        width: 90%;
+        background-color: rgba(255, 255, 255, 0.9); /* Optional: Add some transparency */
+        border-radius: 10px; /* Optional: Add border radius */
+    }
+    .btn-danger {
+        background-color: #fd2323;
+    }
+    .btn-danger:hover {
+        background-color: #f71d1d;
+    }
+    .start-end {
+        text-align: center; /* Center align the logo */
+        margin-bottom: 20px; /* Add some space below the logo */
+    }
+</style>
+
 </head>
 <body class="d-flex align-items-center justify-content-center">
     <div class="forgot-password-container bg-white p-4 rounded shadow">
-        <div class="start-end"> <img src="logo.png" width="80" height="80"></div>
+    <div class="start-end"> 
+    <img src="logo.png" width="80" height="80" alt="Logo"></div>
         <h2 class="text-center mb-3">Forgot Password?</h2>
         <p class="text-center mb-4">Enter your email address and we'll send you instructions to reset your password.</p>
         <?php

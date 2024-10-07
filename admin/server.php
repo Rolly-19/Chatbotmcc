@@ -16,7 +16,7 @@ $errors = array();
 
 
 //connect to database
-$con = mysqli_connect('localhost', 'root', '', 'chatbot_db');
+$con = mysqli_connect('localhost', 'u510162695_chatbot_db', '1Chatbot_db', 'u510162695_chatbot_db');
 
 //for verified email
 

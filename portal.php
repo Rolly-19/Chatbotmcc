@@ -300,4 +300,32 @@
 						</div>`);
 		});
 	})
+
+	function sanitizeInput(input) {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+}
+
+// Function to validate and sanitize form input
+function validateAndSanitizeForm(event) {
+    event.preventDefault();
+    
+    const messageInput = document.querySelector('#send_chat textarea[name="message"]');
+    const sanitizedMessage = sanitizeInput(messageInput.value);
+    
+    if (sanitizedMessage.trim() === '') {
+        alert('Please enter a message.');
+        return false;
+    }
+}
+
+document.getElementById('send_chat').addEventListener('submit', validateAndSanitizeForm);
+
+// Prevent pasting of HTML content
+document.querySelector('#send_chat textarea[name="message"]').addEventListener('paste', function(e) {
+    e.preventDefault();
+    const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+});
 </script>

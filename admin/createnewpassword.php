@@ -45,7 +45,7 @@ if($email == false){
 </head>
 <body class="d-flex align-items-center justify-content-center">
     <div class="new-password-container bg-white p-4 rounded shadow">
-        <div class="start-end"> <img src="logo.png" width="80" height="80"></div>
+        <div class="start-end"> <img src="win.png" width="80" height="80"></div>
         <form action="createnewpassword.php" method="POST" autocomplete="off">
         <h2 class="text-center mb-3">Create New Password</h2>
         <p class="text-center mb-4">Please enter your new password and confirm it.</p>

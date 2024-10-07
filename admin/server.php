@@ -63,7 +63,7 @@ $con = mysqli_connect('localhost', 'root', '', 'chatbot_db');
         $mail->Port = 465;                                   
 
         //Send Email
-        $mail->setFrom('recabarrolly@gmail.com', 'MCC ChatBot.');
+        $mail->setFrom('recabarrolly@gmail.com', 'Windale Hardware Inc.');
         
         //Recipients
         $mail->addAddress($email);              

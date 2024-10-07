@@ -291,17 +291,15 @@
 
 		});
 		$('#reset-convo').click(function() {
-    // Show confirmation dialog
-    if (confirm("Are you sure you want to reset the chat? This action cannot be undone.")) {
-        $('.direct-chat-messages').empty();
-        $('.direct-chat-messages').append(`<div class="direct-chat-msg mr-4">
-            <img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('bot_avatar')) ?>" alt="message user image">
-            <div class="direct-chat-text">
-                <?php echo $_settings->info('intro') ?>
-            </div>
-        </div>`);
-    }
-});
+			$('.direct-chat-messages').empty();
+			$('.direct-chat-messages').append(`<div class="direct-chat-msg mr-4">
+							<img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('bot_avatar')) ?>" alt="message user image">
+							<div class="direct-chat-text">
+								<?php echo $_settings->info('intro') ?>
+							</div>
+						</div>`);
+		});
+	})
 
 	// Function to sanitize user input
 function sanitizeInput(input) {

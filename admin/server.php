@@ -32,7 +32,7 @@ $con = mysqli_connect('localhost', 'u510162695_chatbot_db', '1Chatbot_db', 'u510
             $run_query =  mysqli_query($con, $insert_code);
             if($run_query){
                 $subject = "Reset Password Notification";
-                $message = "<h2>windale Hardware inc.</h2>
+                $message = "<h2>MCCchat.</h2>
                 <p>This is your OTP code:  <b>$code</b> <br><br>
                     Please use this code to set your new password.<br><br>
                     If you didn't request this code, you can disregard this message.
@@ -63,7 +63,7 @@ $con = mysqli_connect('localhost', 'u510162695_chatbot_db', '1Chatbot_db', 'u510
         $mail->Port = 465;                                   
 
         //Send Email
-        $mail->setFrom('recabarrolly@gmail.com', 'Windale Hardware Inc.');
+        $mail->setFrom('recabarrolly@gmail.com', 'MCCchat.');
         
         //Recipients
         $mail->addAddress($email);              

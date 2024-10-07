@@ -35,7 +35,7 @@ if($email == false){
 </head>
 <body class="d-flex align-items-center justify-content-center">
     <div class="verification-container bg-white p-4 rounded shadow">
-        <div class="start-end"> <img src="win.png" width="80" height="80"></div>
+        <div class="start-end"> <img src="logo.png" width="80" height="80"></div>
         <h2 class="text-center mb-3">Enter OTP</h2>
         <p class="text-center mb-4">Enter the otp sent to your email.</p>
         <?php 

@@ -1,31 +1,63 @@
 <style>
 	#chat_convo {
 		max-height: 100vh;
+		/* Increased height */
 		background-color: #f0f0f0;
+		/* Fallback background color */
 		background-image: url('wave.png');
+		/* Path to your background image */
 		background-size: cover;
+		/* Cover the entire area */
 		background-position: center;
+		/* Center the image */
 		background-repeat: no-repeat;
+		/* Do not repeat the image */
 		color: #333333;
+		/* Adjust text color for better readability */
 	}
 
 	#chat_convo .direct-chat-messages {
 		min-height: 350px;
+		/* Increased height */
 		height: inherit;
 		background-color: rgba(255, 255, 255, 0.8);
+		/* Slightly transparent background for better text readability */
+		border-radius: 10px;
+		/* Optional: rounded corners */
+		padding: 10px;
+		/* Optional: add some padding */
+
+	}
+
+	.direct-chat-primary .right>.direct-chat-text {
+		border-color: #d2d6de;
+		color: #fff;
+	}
+
+	.direct-chat-msg .direct-chat-text {
+		background-color: #ffffff;
+		/* Chat bubble background color */
+		color: #333333;
+		/* Chat text color */
 		border-radius: 10px;
 		padding: 10px;
 	}
 
-	.direct-chat-msg .direct-chat-text {
+	.direct-chat-msg.right .direct-chat-text {
 		background-color: #ffffff;
 		color: #333333;
 		border-radius: 10px;
 		padding: 10px;
 	}
 
+	.direct-chat-msg img {
+		border: 1px solid red;
+		/* Red border */
+	}
+
 	.card-footer {
 		background-color: #e9ecef;
+		/* Input area background color */
 	}
 
 	.input-group textarea {
@@ -35,10 +67,12 @@
 
 	.input-group textarea::placeholder {
 		color: #6c757d;
+		/* Input placeholder text color */
 	}
 
 	.input-group-append .btn-primary {
 		background-color: red;
+		/* Send button background color */
 		border-color: red;
 	}
 
@@ -58,17 +92,33 @@
 		animation: typing 1.5s infinite;
 	}
 
+	.typing-indicator span:nth-child(2) {
+		animation-delay: 0.2s;
+	}
+
+	.typing-indicator span:nth-child(3) {
+		animation-delay: 0.4s;
+	}
+
 	@keyframes typing {
-		0%, 60%, 100% { transform: translateY(0); }
-		30% { transform: translateY(-8px); }
+
+		0%,
+		60%,
+		100% {
+			transform: translateY(0);
+		}
+
+		30% {
+			transform: translateY(-8px);
+		}
 	}
 </style>
 
 <div class="container-fluid">
 	<div class="row">
-		<div class="col-lg-10 <?php echo isMobileDevice() == false ? "offset-1" : '' ?>">
+		<div class="col-lg-10 <?php echo isMobileDevice() == false ?  "offset-1" : '' ?>">
 			<div class="card direct-chat direct-chat-primary" id="chat_convo">
-				<div class="card-header">
+				<div class="card-header ui-sortable-handle" style="cursor: move;">
 					<h3 class="card-title">Ask Me</h3>
 					<div class="card-tools">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -84,7 +134,7 @@
 						<div class="direct-chat-msg mr-4">
 							<img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('bot_avatar')) ?>" alt="message user image">
 							<div class="direct-chat-text">
-								<?php echo htmlspecialchars($_settings->info('intro'), ENT_QUOTES, 'UTF-8'); ?>
+								<?php echo $_settings->info('intro') ?>
 							</div>
 						</div>
 					</div>
@@ -92,7 +142,6 @@
 				</div>
 				<div class="card-footer">
 					<form id="send_chat" method="post">
-						<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
 						<div class="input-group">
 							<textarea type="text" name="message" placeholder="Type Message ..." class="form-control" required=""></textarea>
 							<span class="input-group-append">
@@ -128,124 +177,127 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('[name="message"]').keypress(function(e) {
-			if (e.which === 13 && !e.originalEvent.shiftKey) {
-				$('#send_chat').submit();
+			if (e.which === 13 && e.originalEvent.shiftKey == false) {
+				$('#send_chat').submit()
 				return false;
 			}
 		});
 		$('#send_chat').submit(function(e) {
 			e.preventDefault();
-			var message = $('[name="message"]').val().trim();
-			if (message === '') return false;
-
-			// Clone user chat
+			var message = $('[name="message"]').val();
+			if (message == '' || message == null) return false;
 			var uchat = $('#user_chat').clone();
-			uchat.find('.direct-chat-text').html(htmlspecialchars(message));
+			uchat.find('.direct-chat-text').html(message);
 			$('#chat_convo .direct-chat-messages').append(uchat.html());
-			$('[name="message"]').val('');
-
-			// Scroll to bottom
+			$('[name="message"]').val('')
 			$("#chat_convo .card-body").animate({
 				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
 			}, "fast");
 
-			// Typing indicator
 			var typingIndicator = $('#typing_indicator').clone();
 			$('#chat_convo .direct-chat-messages').append(typingIndicator.html());
 			$("#chat_convo .card-body").animate({
 				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
 			}, "fast");
 
-			// AJAX request
-			const requestData = {
-				message: message
-			};
-
-			$.ajax({
-				url: _base_url_ + "classes/Master.php?f=get_response",
-				method: 'POST',
-				data: requestData,
-				error: function(err) {
-					console.error(err);
-					alert_toast("An error occurred.", 'error');
-					end_loader();
-				},
-				success: function(resp) {
-					if (resp) {
-						resp = JSON.parse(resp);
-						if (resp.status == 'success') {
-							handleResponse(resp);
-						}
-					}
-				}
-			});
-
-			function handleResponse(resp) {
-				if (resp.message === "I am sorry. I can't understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)") {
-					// Call AI bot
-					callAiBot(requestData);
-				} else {
-					displayBotMessage(resp.message, 2000);
-				}
-			}
-
-			function callAiBot(requestData) {
-				$.ajax({
-					url: _base_url_ + "classes/api_handler.php",
-					type: 'POST',
-					contentType: 'application/json',
-					data: JSON.stringify(requestData),
-					success: function(response) {
-						let data;
-						try {
-							data = JSON.parse(response);
-						} catch (e) {
-							console.error('Error parsing response:', e);
-							return;
-						}
-						let msgData = data && data.text ? replaceNewlinesWithBr(data.text) : '';
-						displayBotMessage(msgData, 1000);
-					},
-					error: function(xhr, status, error) {
-						console.error('Error:', error);
-						$('#response').text('An error occurred');
-					}
-				});
-			}
-
-			function displayBotMessage(message, delay) {
-				setTimeout(() => {
-					var bot_chat = $('#bot_chat').clone();
-					bot_chat.find('.direct-chat-text').html(htmlspecialchars(message));
-					$('#chat_convo .direct-chat-messages').append(bot_chat.html());
-					$("#chat_convo .card-body").animate({
-						scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
-					}, "fast");
-					$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
-				}, delay);
-			}
-
+			// Function to replace newline characters with <br> tags
 			function replaceNewlinesWithBr(text) {
 				return text.replace(/\n/g, '<br>');
 			}
 
-			function htmlspecialchars(text) {
-				return text.replace(/&/g, '&amp;')
-					.replace(/</g, '&lt;')
-					.replace(/>/g, '&gt;')
-					.replace(/"/g, '&quot;')
-					.replace(/'/g, '&#039;');
-			}
-		});
+			const requestData = {
+				message: message
+			};
 
+			// with the database
+			$.ajax({
+				url:_base_url_ + "classes/Master.php?f=get_response",
+				method: 'POST',
+				data: {
+					message: message
+				},
+				error: err => {
+					console.log(err)
+					alert_toast("An error occured.", 'error');
+					end_loader();
+				},
+				success: function(resp) {
+					console.log(resp)
+					if (resp) {
+						resp = JSON.parse(resp)
+						if (resp.status == 'success') {
+							if (resp.message == `I am sorry. I can't understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)`) {
+								// with the aibot
+								$.ajax({
+									url:_base_url_ + "classes/api_handler.php",
+									type: 'POST',
+									contentType: 'application/json',
+									data: JSON.stringify(requestData),
+									success: function(response) {
+										let data;
+										try {
+											data = JSON.parse(response);
+										} catch (e) {
+											console.error('Error parsing response:', e);
+											return;
+										}
+
+										let msgData = '';
+										let formatedText = replaceNewlinesWithBr(data.text);
+										if (data && data.text) {
+											msgData = removeOuterQuotes(formatedText); // Clean the text
+										}
+										
+										setTimeout(() => {
+											var bot_chat = $('#bot_chat').clone();
+											bot_chat.find('.direct-chat-text').html(msgData);
+											$('#chat_convo .direct-chat-messages').append(bot_chat.html());
+											$("#chat_convo .card-body").animate({
+												scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+											}, "fast");
+											$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
+										}, 1000)
+									},
+									error: function(xhr, status, error) {
+										console.error('Error:', error);
+										$('#response').text('An error occurred');
+									}
+								});
+							} else {
+								setTimeout(() => {
+									// with the database data result
+									var bot_chat = $('#bot_chat').clone();
+									bot_chat.find('.direct-chat-text').html(resp.message);
+									$('#chat_convo .direct-chat-messages').append(bot_chat.html());
+									$("#chat_convo .card-body").animate({
+										scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+									}, "fast");
+									$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
+								}, 2000)
+							}
+						}
+					}
+				}
+			});
+			// Function to remove only the first and last quote
+			function removeOuterQuotes(text) {
+				// Check if the text starts and ends with a quote
+				if (text.startsWith('"') && text.endsWith('"')) {
+					return text.slice(1, -1); // Remove the first and last character
+				}
+				return text; // Return text as is if no outer quotes
+			};
+
+
+		});
 		$('#reset-convo').click(function() {
 			$('.direct-chat-messages').empty();
 			$('.direct-chat-messages').append(`<div class="direct-chat-msg mr-4">
-				<img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('bot_avatar')) ?>" alt="message user image">
-				<div class="direct-chat-text">
-					<?php echo htmlspecialchars($_settings->info('intro'), ENT_QUOTES, 'UTF-8'); ?>
-				</div>
-			</div>`);
+							<img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('bot_avatar')) ?>" alt="message user image">
+							<div class="direct-chat-text">
+								<?php echo $_settings->info('intro') ?>
+							</div>
+						</div>`);
 		});
-	});
+	})
 </script>

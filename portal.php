@@ -145,7 +145,7 @@
 						<div class="input-group">
 							<textarea type="text" name="message" placeholder="Type Message ..." class="form-control" required></textarea>
 							<span class="input-group-append">
-								<button type="submit" class="btn btn-primary">Send</button>
+								<button type="submit" class="btn btn-primary"><i class="fas-fa-plane"></i></button>
 							</span>
 						</div>
 					</form>

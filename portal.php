@@ -301,14 +301,15 @@
 		});
 	})
 
-	function sanitizeInput(input) {
+	// Function to sanitize user input
+function sanitizeInput(input) {
     const div = document.createElement('div');
     div.textContent = input;
     return div.innerHTML;
 }
 
-// Function to validate and sanitize form input
-function validateAndSanitizeForm(event) {
+
+	function validateAndSanitizeForm(event) {
     event.preventDefault();
     
     const messageInput = document.querySelector('#send_chat textarea[name="message"]');
@@ -318,8 +319,15 @@ function validateAndSanitizeForm(event) {
         alert('Please enter a message.');
         return false;
     }
+    
+    // Here you would typically send the sanitizedMessage to your server
+    console.log('Sanitized message:', sanitizedMessage);
+    
+    // Clear the input field after sending
+    messageInput.value = '';
 }
 
+// Add event listener to the form
 document.getElementById('send_chat').addEventListener('submit', validateAndSanitizeForm);
 
 // Prevent pasting of HTML content

@@ -226,7 +226,7 @@
 					if (resp) {
 						resp = JSON.parse(resp)
 						if (resp.status == 'success') {
-							if (resp.message == `I am sorry. I can&apos;t understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)`) {
+							if (resp.message == `I am sorry. I can't understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)`) {
 								// with the aibot
 								$.ajax({
 									url:_base_url_ + "classes/api_handler.php",

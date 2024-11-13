@@ -27,8 +27,8 @@
 				</thead>
 				<tbody>
 					<?php 
-					$i = 1;
-						$qry = $conn->query("SELECT * FROM `unanswered`  order by question asc ");
+				
+                $qry = $conn->query("SELECT * FROM `unanswered` WHERE id >= 4 ORDER BY question ASC");
 						while($row = $qry->fetch_assoc()):
 					?>
 						<tr>

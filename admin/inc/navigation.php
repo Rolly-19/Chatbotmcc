@@ -72,7 +72,7 @@
               <li class="nav-item dropdown">
                 <a href="<?php echo base_url ?>admin/?page=unanswered" class="nav-link nav-unanswered">
                   <i class="nav-icon fas fa-question-circle"></i>
-                  <p>Unansasdasdwered List</p>
+                  <p>Unanswered List</p>
                 </a>
               </li>
             </ul>

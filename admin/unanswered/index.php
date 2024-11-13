@@ -1,11 +1,4 @@
-<?php if($_settings->chk_flashdata('success')): 
-	
-	// Assuming you have an active connection to your MySQL database as $conn
-	
-	// Delete rows with id = 1, 2, and 3
-	$conn->query("DELETE FROM `unanswered` WHERE `id` IN (1, 2, 3)");
-	
-	?>
+<?php if($_settings->chk_flashdata('success')): ?>
 <script>
 	alert_toast("<?php echo $_settings->flashdata('success') ?>",'success')
 </script>
@@ -34,8 +27,7 @@
 				<tbody>
 					<?php 
 					$i = 1;
-					$qry = $conn->query("SELECT * FROM `unanswered` WHERE `id` != 3 ORDER BY question ASC");
-
+						$qry = $conn->query("SELECT * FROM `questions` ");
 						while($row = $qry->fetch_assoc()):
 					?>
 						<tr>

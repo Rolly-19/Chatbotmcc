@@ -16,7 +16,7 @@
 					<col width="25%">
 					<col width="20%">
 				</colgroup>
-				<thead>
+				<!-- <thead>
 					<tr>
 						<th>#</th>
 						<th>Question</th>
@@ -47,7 +47,7 @@
 							</td>
 						</tr>
 					<?php endwhile; ?>
-				</tbody>
+				</tbody> -->
 			</table>
 		</div>
 	</div>

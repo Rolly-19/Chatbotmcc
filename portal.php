@@ -176,138 +176,93 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('[name="message"]').keypress(function(e) {
-			if (e.which === 13 && e.originalEvent.shiftKey == false) {
-				$('#send_chat').submit()
-				return false;
-			}
-		});
-		$('#send_chat').submit(function(e) {
-			e.preventDefault();
-			var message = $('[name="message"]').val();
-			if (message == '' || message == null) return false;
-			var uchat = $('#user_chat').clone();
-			uchat.find('.direct-chat-text').html(message);
-			$('#chat_convo .direct-chat-messages').append(uchat.html());
-			$('[name="message"]').val('')
-			$("#chat_convo .card-body").animate({
-				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
-			}, "fast");
+    // Prevent form submission if message is empty
+    $('#send_chat').submit(function(e) {
+        e.preventDefault();
+        var message = $('[name="message"]').val().trim();
+        
+        if (message === '') {
+            alert('Please enter a message.');
+            return false;
+        }
 
-			var typingIndicator = $('#typing_indicator').clone();
-			$('#chat_convo .direct-chat-messages').append(typingIndicator.html());
-			$("#chat_convo .card-body").animate({
-				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
-			}, "fast");
+        // Sanitize user input before appending
+        message = sanitizeInput(message);
 
-			// Function to replace newline characters with <br> tags
-			function replaceNewlinesWithBr(text) {
-				return text.replace(/\n/g, '<br>');
-			}
+        // Proceed to send sanitized message to the server
+        var uchat = $('#user_chat').clone();
+        uchat.find('.direct-chat-text').html(message);
+        $('#chat_convo .direct-chat-messages').append(uchat.html());
 
-			const requestData = {
-				message: message
-			};
+        // Clear the input field after sending
+        $('[name="message"]').val('');
 
-			// with the database
-			$.ajax({
-				url:_base_url_ + "classes/Master.php?f=get_response",
-				method: 'POST',
-				data: {
-					message: message
-				},
-				error: err => {
-					console.log(err)
-					alert_toast("An error occured.", 'error');
-					end_loader();
-				},
-				success: function(resp) {
-					console.log(resp)
-					if (resp) {
-						resp = JSON.parse(resp)
-						if (resp.status == 'success') {
-							if (resp.message == "I am sorry. I can&apos;t understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)") {
-								// with the aibot
-								$.ajax({
-									url:_base_url_ + "classes/api_handler.php",
-									type: 'POST',
-									contentType: 'application/json',
-									data: JSON.stringify(requestData),
-									success: function(response) {
-										let data;
-										try {
-											data = JSON.parse(response);
-										} catch (e) {
-											console.error('Error parsing response:', e);
-											return;
-										}
+        // Scroll to bottom of chat
+        $("#chat_convo .card-body").animate({
+            scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+        }, "fast");
 
-										let msgData = '';
-										let formatedText = replaceNewlinesWithBr(data.text);
-										if (data && data.text) {
-											msgData = removeOuterQuotes(formatedText); // Clean the text
-										}
-										
-										setTimeout(() => {
-											var bot_chat = $('#bot_chat').clone();
-											bot_chat.find('.direct-chat-text').html(msgData);
-											$('#chat_convo .direct-chat-messages').append(bot_chat.html());
-											$("#chat_convo .card-body").animate({
-												scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
-											}, "fast");
-											$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
-										}, 1000)
-									},
-									error: function(xhr, status, error) {
-										console.error('Error:', error);
-										$('#response').text('An error occurred');
-									}
-								});
-							} else {
-								setTimeout(() => {
-									// with the database data result
-									var bot_chat = $('#bot_chat').clone();
-									bot_chat.find('.direct-chat-text').html(resp.message);
-									$('#chat_convo .direct-chat-messages').append(bot_chat.html());
-									$("#chat_convo .card-body").animate({
-										scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
-									}, "fast");
-									$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
-								}, 2000)
-							}
-						}
-					}
-				}
-			});
-			// Function to remove only the first and last quote
-			function removeOuterQuotes(text) {
-				// Check if the text starts and ends with a quote
-				if (text.startsWith('"') && text.endsWith('"')) {
-					return text.slice(1, -1); // Remove the first and last character
-				}
-				return text; // Return text as is if no outer quotes
-			};
+        // Show typing indicator
+        var typingIndicator = $('#typing_indicator').clone();
+        $('#chat_convo .direct-chat-messages').append(typingIndicator.html());
+        $("#chat_convo .card-body").animate({
+            scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+        }, "fast");
 
+        // Send message to server
+        $.ajax({
+            url: _base_url_ + "classes/Master.php?f=get_response",
+            method: 'POST',
+            data: { message: message },
+            error: function(err) {
+                console.log(err);
+                alert_toast("An error occurred.", 'error');
+                end_loader();
+            },
+            success: function(resp) {
+                console.log(resp);
+                if (resp) {
+                    resp = JSON.parse(resp);
+                    if (resp.status == 'success') {
+                        // Handle bot response
+                        setTimeout(() => {
+                            var bot_chat = $('#bot_chat').clone();
+                            bot_chat.find('.direct-chat-text').html(resp.message);
+                            $('#chat_convo .direct-chat-messages').append(bot_chat.html());
+                            $("#chat_convo .card-body").animate({
+                                scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
+                            }, "fast");
+                            $('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
+                        }, 2000);
+                    }
+                }
+            }
+        });
+    });
 
-		});
-		$('#reset-convo').click(function() {
-			$('.direct-chat-messages').empty();
-			$('.direct-chat-messages').append(`<div class="direct-chat-msg mr-4">
-							<img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('bot_avatar')) ?>" alt="message user image">
-							<div class="direct-chat-text">
-								<?php echo $_settings->info('intro') ?>
-							</div>
-						</div>`);
-		});
-	})
+    // Handle the reset button
+    $('#reset-convo').click(function() {
+        $('.direct-chat-messages').empty();
+        $('.direct-chat-messages').append(`<div class="direct-chat-msg mr-4">
+            <img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('bot_avatar')) ?>" alt="message user image">
+            <div class="direct-chat-text">
+                <?php echo $_settings->info('intro') ?>
+            </div>
+        </div>`);
+    });
 
-	// Function to sanitize user input
-function sanitizeInput(input) {
-    const div = document.createElement('div');
-    div.textContent = input;
-    return div.innerHTML;
+    // Prevent pasting HTML content into the textarea
+    $('#send_chat textarea[name="message"]').on('paste', function(e) {
+        e.preventDefault();
+        const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+        document.execCommand('insertText', false, text);
+    });
+});
+
+	// Improved sanitization function
+	function sanitizeInput(input) {
+    return DOMPurify.sanitize(input);  // Use DOMPurify to clean the input
 }
-
 
 	function validateAndSanitizeForm(event) {
     event.preventDefault();

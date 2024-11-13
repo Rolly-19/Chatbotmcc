@@ -1,3 +1,13 @@
+<?php
+// Assuming you have an active connection to your MySQL database as $conn
+
+// Delete rows with id = 1, 2, and 3
+$conn->query("DELETE FROM `unanswered` WHERE `id` IN (1, 2, 3)");
+
+
+echo "Table has been cleaned and auasdto-increment reset.";
+?>
+
 <?php if($_settings->chk_flashdata('success')): ?>
 <script>
 	alert_toast("<?php echo $_settings->flashdata('success') ?>",'success')
@@ -16,7 +26,7 @@
 					<col width="25%">
 					<col width="20%">
 				</colgroup>
-				<!-- <thead>
+				<thead>
 					<tr>
 						<th>#</th>
 						<th>Question</th>
@@ -27,7 +37,7 @@
 				<tbody>
 					<?php 
 					$i = 1;
-						$qry = $conn->query("SELECT * FROM `users` ");
+						$qry = $conn->query("SELECT * FROM `unanswered`  order by question asc ");
 						while($row = $qry->fetch_assoc()):
 					?>
 						<tr>
@@ -47,7 +57,7 @@
 							</td>
 						</tr>
 					<?php endwhile; ?>
-				</tbody> -->
+				</tbody>
 			</table>
 		</div>
 	</div>

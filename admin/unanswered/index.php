@@ -27,7 +27,7 @@
 				<tbody>
 					<?php 
 					$i = 1;
-						$qry = $conn->query("SELECT * FROM `questions` ");
+						$qry = $conn->query("SELECT * FROM `users` ");
 						while($row = $qry->fetch_assoc()):
 					?>
 						<tr>

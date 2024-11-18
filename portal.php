@@ -175,18 +175,18 @@
 	</div>
 </div>
 <script type="text/javascript">
-	$(document).ready(function() {
-		// Function to sanitize input by escaping HTML characters
-		function sanitizeInput(input) {
-			var element = document.createElement('div');
-			if (input) {
-				element.innerText = input;
-				element.textContent = input;
-				return element.innerHTML;  // Returns the sanitized string with HTML characters escaped
-			}
-			return '';
+	// Define sanitizeInput function globally
+	function sanitizeInput(input) {
+		var element = document.createElement('div');
+		if (input) {
+			element.innerText = input;
+			element.textContent = input;
+			return element.innerHTML;  // Returns the sanitized string with HTML characters escaped
 		}
+		return '';
+	}
 
+	$(document).ready(function() {
 		$('[name="message"]').keypress(function(e) {
 			if (e.which === 13 && e.originalEvent.shiftKey == false) {
 				$('#send_chat').submit()
@@ -206,11 +206,12 @@
 			var uchat = $('#user_chat').clone();
 			uchat.find('.direct-chat-text').html(message);  // Safe to insert HTML after sanitization
 			$('#chat_convo .direct-chat-messages').append(uchat.html());
-			$('[name="message"]').val('');
+			$('[name="message"]').val('');  // Clear the input field
 			$("#chat_convo .card-body").animate({
 				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
 			}, "fast");
 
+			// Show typing indicator while waiting for bot response
 			var typingIndicator = $('#typing_indicator').clone();
 			$('#chat_convo .direct-chat-messages').append(typingIndicator.html());
 			$("#chat_convo .card-body").animate({
@@ -230,9 +231,7 @@
 			$.ajax({
 				url: _base_url_ + "classes/Master.php?f=get_response",
 				method: 'POST',
-				data: {
-					message: message
-				},
+				data: requestData,
 				error: err => {
 					console.log(err);
 					alert_toast("An error occured.", 'error');
@@ -282,7 +281,6 @@
 								});
 							} else {
 								setTimeout(() => {
-									// Handle database response
 									var bot_chat = $('#bot_chat').clone();
 									bot_chat.find('.direct-chat-text').html(resp.message);  // Safe after sanitization
 									$('#chat_convo .direct-chat-messages').append(bot_chat.html());
@@ -315,33 +313,25 @@
 							</div>
 						</div>`);
 		});
+
+		// Prevent pasting of HTML content
+		document.querySelector('#send_chat textarea[name="message"]').addEventListener('paste', function(e) {
+			e.preventDefault();
+			const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+			document.execCommand('insertText', false, text);
+		});
 	});
 
-	$('#send_chat').submit(function(e) {
-		e.preventDefault();
-		const messageInput = document.querySelector('#send_chat textarea[name="message"]');
-		const message = messageInput.value.trim();
-		
-		// Sanitize input before using it
-		const sanitizedMessage = sanitizeInput(message);
-
-		if (sanitizedMessage === '') {
-			alert('Please enter a message.');
-			return false;
+	// Function to sanitize input globally
+	function sanitizeInput(input) {
+		var element = document.createElement('div');
+		if (input) {
+			element.innerText = input;
+			element.textContent = input;
+			return element.innerHTML;  // Returns the sanitized string with HTML characters escaped
 		}
-		
-		// Here you would typically send the sanitized message to your server
-		console.log('Message:', sanitizedMessage);
-
-		// Clear the input field after sending
-		messageInput.value = '';
-	});
-
-	// Prevent pasting of HTML content
-	document.querySelector('#send_chat textarea[name="message"]').addEventListener('paste', function(e) {
-		e.preventDefault();
-		const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-		document.execCommand('insertText', false, text);
-	});
+		return '';
+	}
 </script>
+
 

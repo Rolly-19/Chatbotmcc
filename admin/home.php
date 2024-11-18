@@ -22,66 +22,88 @@
   <!-- /.card-body -->
 </div>
 <!-- /.card -->
+
 <?php
 
+// Fetch all questions that are in the frequent_asks table
 $questions = $conn->query("SELECT * FROM `questions` WHERE id IN (SELECT question_id FROM frequent_asks) ");
 $list = array();
-while($row = $questions->fetch_assoc()){
-  $count = $conn->query("SELECT * FROM frequent_asks WHERE question_id = {$row['id']} ")->num_rows;
-  $list[] = array("count"=>$count,"question" =>$row['question']);
+while ($row = $questions->fetch_assoc()) {
+    // Count the number of times each question appears in the frequent_asks table
+    $count = $conn->query("SELECT * FROM frequent_asks WHERE question_id = {$row['id']} ")->num_rows;
+    $list[] = array("count" => $count, "question" => $row['question']);
 }
 
-usort($list, function($a, $b) {
-  return $b['count'] - $a['count'];
+// Sort questions by count in descending order
+usort($list, function ($a, $b) {
+    return $b['count'] - $a['count'];  // Sorting in descending order of frequency
 });
 
+// Top 10 questions
 $label = array();
 $data = array();
-$i = 10; // Set limit to top 10
-foreach($list as $k => $v){
-  $i--;
-  $label[] = $v['question'];
-  $data[] = $v['count'];
-  if($i == 0)
-    break;
+$i = 10; // Limit to top 10
+foreach ($list as $k => $v) {
+    $i--;
+    $label[] = $v['question'];
+    $data[] = $v['count'];
+    if ($i == 0)
+        break;
+}
+
+// For displaying all questions
+$all_label = array();
+$all_data = array();
+foreach ($list as $v) {
+    $all_label[] = $v['question'];
+    $all_data[] = $v['count'];
 }
 ?>
+
+<!-- All Questions List (Display below the chart) -->
+<h3>All Questions</h3>
+<ul>
+  <?php foreach($list as $question): ?>
+    <li><?php echo $question['question'] . " - " . $question['count']; ?></li>
+  <?php endforeach; ?>
+</ul>
+
 <script>
   $(function() {
+    // Bar Chart Data (Top 10 Frequent Questions)
     var barChartData = {
       labels  : ['<?php echo implode('\',\'',$label) ?>'],
-      datasets: [
-        {
-          label               : 'Frequent Asks',
-          backgroundColor     : [
-            'rgba(60,141,188,0.9)',
-            'rgba(210, 214, 222, 1)',
-            'rgba(255, 159, 64, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 205, 86, 1)',
-            'rgba(231, 233, 237, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 99, 132, 1)',
-            'rgba(201, 203, 207, 1)'
-          ],
-          borderColor         : [
-            'rgba(60,141,188,1)',
-            'rgba(210, 214, 222, 1)',
-            'rgba(255, 159, 64, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 205, 86, 1)',
-            'rgba(231, 233, 237, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 99, 132, 1)',
-            'rgba(201, 203, 207, 1)'
-          ],
-          data                : [<?php echo implode(',',$data) ?>]
-        }
-      ]
-    }
+      datasets: [{
+        label               : 'Frequent Asks',
+        backgroundColor     : [
+          'rgba(60,141,188,0.9)',
+          'rgba(210, 214, 222, 1)',
+          'rgba(255, 159, 64, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 205, 86, 1)',
+          'rgba(231, 233, 237, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 99, 132, 1)',
+          'rgba(201, 203, 207, 1)'
+        ],
+        borderColor         : [
+          'rgba(60,141,188,1)',
+          'rgba(210, 214, 222, 1)',
+          'rgba(255, 159, 64, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 205, 86, 1)',
+          'rgba(231, 233, 237, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 99, 132, 1)',
+          'rgba(201, 203, 207, 1)'
+        ],
+        data                : [<?php echo implode(',',$data) ?>]
+      }]
+    };
 
+    // Bar Chart Options
     var barChartOptions = {
       maintainAspectRatio : false,
       responsive : true,
@@ -100,7 +122,6 @@ foreach($list as $k => $v){
           }
         }]
       },
-      // Adding background image
       plugins: {
         datalabels: {
           display: false,
@@ -111,7 +132,6 @@ foreach($list as $k => $v){
           bottom: 20,
         }
       },
-      // Adding background image during chart render
       beforeDraw: function(chart) {
         var ctx = chart.ctx;
         var img = new Image();
@@ -120,17 +140,14 @@ foreach($list as $k => $v){
           ctx.drawImage(img, 0, 0, chart.width, chart.height);
         };
       }
-    }
+    };
 
-    //-------------
-    //- BAR CHART -
-    //-------------
-    var barChartCanvas = $('#barChart').get(0).getContext('2d')
+    // Initialize the Bar Chart
+    var barChartCanvas = $('#barChart').get(0).getContext('2d');
     new Chart(barChartCanvas, {
       type: 'bar',
       data: barChartData,
       options: barChartOptions
-    })
-
+    });
   })
 </script>

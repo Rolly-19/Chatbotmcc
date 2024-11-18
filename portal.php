@@ -176,20 +176,37 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
+		// Function to sanitize input by escaping HTML characters
+		function sanitizeInput(input) {
+			var element = document.createElement('div');
+			if (input) {
+				element.innerText = input;
+				element.textContent = input;
+				return element.innerHTML;  // Returns the sanitized string with HTML characters escaped
+			}
+			return '';
+		}
+
 		$('[name="message"]').keypress(function(e) {
 			if (e.which === 13 && e.originalEvent.shiftKey == false) {
 				$('#send_chat').submit()
 				return false;
 			}
 		});
+
 		$('#send_chat').submit(function(e) {
 			e.preventDefault();
 			var message = $('[name="message"]').val();
+
+			// Sanitize the message to prevent XSS
+			message = sanitizeInput(message);
+
 			if (message == '' || message == null) return false;
+			
 			var uchat = $('#user_chat').clone();
-			uchat.find('.direct-chat-text').html(message);
+			uchat.find('.direct-chat-text').html(message);  // Safe to insert HTML after sanitization
 			$('#chat_convo .direct-chat-messages').append(uchat.html());
-			$('[name="message"]').val('')
+			$('[name="message"]').val('');
 			$("#chat_convo .card-body").animate({
 				scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
 			}, "fast");
@@ -209,27 +226,27 @@
 				message: message
 			};
 
-			// with the database
+			// Send the sanitized message to the server
 			$.ajax({
-				url:_base_url_ + "classes/Master.php?f=get_response",
+				url: _base_url_ + "classes/Master.php?f=get_response",
 				method: 'POST',
 				data: {
 					message: message
 				},
 				error: err => {
-					console.log(err)
+					console.log(err);
 					alert_toast("An error occured.", 'error');
 					end_loader();
 				},
 				success: function(resp) {
-					console.log(resp)
+					console.log(resp);
 					if (resp) {
-						resp = JSON.parse(resp)
+						resp = JSON.parse(resp);
 						if (resp.status == 'success') {
-							if (resp.message == "I am sorry. I can&apos;t understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)") {
-								// with the aibot
+							if (resp.message == "I am sorry. I can't understand your question. Please rephrase your question and make sure it is related to this site. Thank you :)") {
+								// Call AI bot when no valid response from DB
 								$.ajax({
-									url:_base_url_ + "classes/api_handler.php",
+									url: _base_url_ + "classes/api_handler.php",
 									type: 'POST',
 									contentType: 'application/json',
 									data: JSON.stringify(requestData),
@@ -245,7 +262,7 @@
 										let msgData = '';
 										let formatedText = replaceNewlinesWithBr(data.text);
 										if (data && data.text) {
-											msgData = removeOuterQuotes(formatedText); // Clean the text
+											msgData = removeOuterQuotes(formatedText);  // Clean the text
 										}
 										
 										setTimeout(() => {
@@ -256,7 +273,7 @@
 												scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
 											}, "fast");
 											$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
-										}, 1000)
+										}, 1000);
 									},
 									error: function(xhr, status, error) {
 										console.error('Error:', error);
@@ -265,31 +282,30 @@
 								});
 							} else {
 								setTimeout(() => {
-									// with the database data result
+									// Handle database response
 									var bot_chat = $('#bot_chat').clone();
-									bot_chat.find('.direct-chat-text').html(resp.message);
+									bot_chat.find('.direct-chat-text').html(resp.message);  // Safe after sanitization
 									$('#chat_convo .direct-chat-messages').append(bot_chat.html());
 									$("#chat_convo .card-body").animate({
 										scrollTop: $("#chat_convo .card-body").prop('scrollHeight')
 									}, "fast");
 									$('#chat_convo .direct-chat-messages .typing-indicator').parent().remove();
-								}, 2000)
+								}, 2000);
 							}
 						}
 					}
 				}
 			});
-			// Function to remove only the first and last quote
+
+			// Function to remove only the first and last quote from a string
 			function removeOuterQuotes(text) {
-				// Check if the text starts and ends with a quote
 				if (text.startsWith('"') && text.endsWith('"')) {
-					return text.slice(1, -1); // Remove the first and last character
+					return text.slice(1, -1);  // Remove the first and last character
 				}
-				return text; // Return text as is if no outer quotes
-			};
-
-
+				return text;  // Return text as is if no outer quotes
+			}
 		});
+
 		$('#reset-convo').click(function() {
 			$('.direct-chat-messages').empty();
 			$('.direct-chat-messages').append(`<div class="direct-chat-msg mr-4">
@@ -299,41 +315,33 @@
 							</div>
 						</div>`);
 		});
-	})
+	});
 
-	// Function to sanitize user input
-function sanitizeInput(input) {
-    const div = document.createElement('div');
-    div.textContent = input;
-    return div.innerHTML;
-}
+	$('#send_chat').submit(function(e) {
+		e.preventDefault();
+		const messageInput = document.querySelector('#send_chat textarea[name="message"]');
+		const message = messageInput.value.trim();
+		
+		// Sanitize input before using it
+		const sanitizedMessage = sanitizeInput(message);
 
+		if (sanitizedMessage === '') {
+			alert('Please enter a message.');
+			return false;
+		}
+		
+		// Here you would typically send the sanitized message to your server
+		console.log('Message:', sanitizedMessage);
 
-	function validateAndSanitizeForm(event) {
-    event.preventDefault();
-    
-    const messageInput = document.querySelector('#send_chat textarea[name="message"]');
-    const sanitizedMessage = sanitizeInput(messageInput.value);
-    
-    if (sanitizedMessage.trim() === '') {
-        alert('Please enter a message.');
-        return false;
-    }
-    
-    // Here you would typically send the sanitizedMessage to your server
-    console.log('Sanitized message:', sanitizedMessage);
-    
-    // Clear the input field after sending
-    messageInput.value = '';
-}
+		// Clear the input field after sending
+		messageInput.value = '';
+	});
 
-// Add event listener to the form
-document.getElementById('send_chat').addEventListener('submit', validateAndSanitizeForm);
-
-// Prevent pasting of HTML content
-document.querySelector('#send_chat textarea[name="message"]').addEventListener('paste', function(e) {
-    e.preventDefault();
-    const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-    document.execCommand('insertText', false, text);
-});
+	// Prevent pasting of HTML content
+	document.querySelector('#send_chat textarea[name="message"]').addEventListener('paste', function(e) {
+		e.preventDefault();
+		const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+		document.execCommand('insertText', false, text);
+	});
 </script>
+

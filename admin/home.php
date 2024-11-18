@@ -15,6 +15,43 @@
     </div>
   </div>
   <div class="card-body">
+    <!-- First, fetch and populate the questions data -->
+    <?php
+    // Fetch all questions that are in the frequent_asks table
+    $questions = $conn->query("SELECT * FROM `questions` WHERE id IN (SELECT question_id FROM frequent_asks) ");
+    $list = array();
+    while ($row = $questions->fetch_assoc()) {
+        // Count the number of times each question appears in the frequent_asks table
+        $count = $conn->query("SELECT * FROM frequent_asks WHERE question_id = {$row['id']} ")->num_rows;
+        $list[] = array("count" => $count, "question" => $row['question']);
+    }
+
+    // Sort questions by count in descending order
+    usort($list, function ($a, $b) {
+        return $b['count'] - $a['count'];  // Sorting in descending order of frequency
+    });
+
+    // Top 10 questions
+    $label = array();
+    $data = array();
+    $i = 10; // Limit to top 10
+    foreach ($list as $k => $v) {
+        $i--;
+        $label[] = $v['question'];
+        $data[] = $v['count'];
+        if ($i == 0)
+            break;
+    }
+
+    // For displaying all questions (if needed)
+    $all_label = array();
+    $all_data = array();
+    foreach ($list as $v) {
+        $all_label[] = $v['question'];
+        $all_data[] = $v['count'];
+    }
+    ?>
+
     <!-- Display the total number of questions above the chart -->
     <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">
       Total Questions: <?php echo count($list); ?>
@@ -26,43 +63,6 @@
   <!-- /.card-body -->
 </div>
 <!-- /.card -->
-
-<?php
-
-// Fetch all questions that are in the frequent_asks table
-$questions = $conn->query("SELECT * FROM `questions` WHERE id IN (SELECT question_id FROM frequent_asks) ");
-$list = array();
-while ($row = $questions->fetch_assoc()) {
-    // Count the number of times each question appears in the frequent_asks table
-    $count = $conn->query("SELECT * FROM frequent_asks WHERE question_id = {$row['id']} ")->num_rows;
-    $list[] = array("count" => $count, "question" => $row['question']);
-}
-
-// Sort questions by count in descending order
-usort($list, function ($a, $b) {
-    return $b['count'] - $a['count'];  // Sorting in descending order of frequency
-});
-
-// Top 10 questions
-$label = array();
-$data = array();
-$i = 10; // Limit to top 10
-foreach ($list as $k => $v) {
-    $i--;
-    $label[] = $v['question'];
-    $data[] = $v['count'];
-    if ($i == 0)
-        break;
-}
-
-// For displaying all questions
-$all_label = array();
-$all_data = array();
-foreach ($list as $v) {
-    $all_label[] = $v['question'];
-    $all_data[] = $v['count'];
-}
-?>
 
 <!-- All Questions List (Display below the chart) -->
 <h3>All Questions</h3>

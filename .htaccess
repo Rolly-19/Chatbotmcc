@@ -1,26 +1,7 @@
 <IfModule mod_rewrite.c>
-
-    # Set CORS header to allow requests from any origin
-    Header set Access-Control-Allow-Origin "*"
-
-    # Enable mod_rewrite
-    RewriteEngine On
-
-    # Set the base path for the admin section
-    RewriteBase /
-
-    # Rewrite rule to handle clean URLs without .php extension
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME}.php -f
-    RewriteRule ^(.+)$ $1.php [L]
-
-    # Default rewrite rule to route requests to index.php, passing the URL as a query parameter
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ /index.php/?page=$1 [L]
-
-    # Ensure symbolic links are followed
-    Options +FollowSymLinks
-
+Header set Access-Control-Allow-Origin "*"
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$    /index.php/$2/?page=$1   [L]
 </IfModule>

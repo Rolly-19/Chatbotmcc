@@ -69,7 +69,7 @@
         success: function(response){
             if(response.status === 'success'){
                 // Redirect to dashboard or whatever page after successful login
-                window.location.href = 'dashboard.php';
+                window.location.href = 'home.php';
             } else if(response.status === 'incorrect'){
                 alert('Incorrect username or password');
             } else if(response.status === 'locked'){

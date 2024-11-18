@@ -58,28 +58,6 @@
 <script src="dist/js/adminlte.min.js"></script>
 
 <script>
-  $(document).on('submit', '#loginForm', function(e){
-    e.preventDefault();
-
-    $.ajax({
-        url: 'login.php?f=login',
-        type: 'POST',
-        data: $(this).serialize(),
-        dataType: 'json',
-        success: function(response){
-            if(response.status === 'success'){
-                // Redirect to dashboard or whatever page after successful login
-                window.location.href = 'home.php';
-            } else if(response.status === 'incorrect'){
-                alert('Incorrect username or password');
-            } else if(response.status === 'locked'){
-                var remainingTime = response.remaining_time;
-                alert('Too many failed login attempts. Please try again in ' + (remainingTime / 60) + ' minutes.');
-            }
-        }
-    });
-});
-
   $(document).ready(function(){
     end_loader();
     

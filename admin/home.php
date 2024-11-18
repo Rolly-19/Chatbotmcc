@@ -15,6 +15,10 @@
     </div>
   </div>
   <div class="card-body">
+    <!-- Display the total number of questions above the chart -->
+    <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">
+      Total Questions: <?php echo count($list); ?>
+    </div>
     <div class="chart">
       <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
     </div>

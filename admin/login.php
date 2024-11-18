@@ -34,7 +34,7 @@
         </div>
         <div class="row">
           <div class="col-12">
-            <a href="forgot-password.php" class="text-left">Forgot Password?</a>
+            <a href="forgot-password" class="text-left">Forgot Password?</a>
           </div>
         </div>
         <div class="row">

@@ -64,14 +64,6 @@
 </div>
 <!-- /.card -->
 
-<!-- All Questions List (Display below the chart) -->
-<h3>All Questions</h3>
-<ul>
-  <?php foreach($list as $question): ?>
-    <li><?php echo $question['question'] . " - " . $question['count']; ?></li>
-  <?php endforeach; ?>
-</ul>
-
 <script>
   $(function() {
     // Bar Chart Data (Top 10 Frequent Questions)

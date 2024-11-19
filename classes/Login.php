@@ -90,26 +90,20 @@ class Login extends DBConnection {
         }
     }
     
-
     private function incrementFailedAttempts($username) {
         // Increment failed login attempts and set timestamp of the last failed attempt
         $stmt = $this->conn->prepare("UPDATE users SET failed_attempts = failed_attempts + 1, last_failed_attempt = NOW() WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
     }
-
+    
     private function resetFailedAttempts($username) {
         // Reset failed attempts after successful login or when lockout period has passed
         $stmt = $this->conn->prepare("UPDATE users SET failed_attempts = 0, last_failed_attempt = NULL WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
     }
-
-    public function logout(){
-        if ($this->settings->sess_des()) {
-            redirect('admin/login.php');
-        }
-    }
+    
 }
 
 // Check if there's an action to perform (like login or logout)

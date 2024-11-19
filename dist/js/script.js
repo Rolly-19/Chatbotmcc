@@ -83,6 +83,7 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 					}
 				}
 			});
+			
 		});
 	//Establishment Login
 	$('#flogin-frm').submit(function(e){

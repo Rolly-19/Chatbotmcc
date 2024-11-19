@@ -35,12 +35,12 @@ class Login extends DBConnection {
             if ($user['failed_attempts'] >= 3) {
                 $last_failed = strtotime($user['last_failed_attempt']);
                 $current_time = time();
-            
+    
                 // Lockout period (1 minute)
                 if ($current_time - $last_failed < 60) { // 60 seconds = 1 minute
                     $remaining_time = 60 - ($current_time - $last_failed); // Remaining time in seconds
                     $remaining_minutes = ceil($remaining_time / 60); // Convert to minutes
-            
+    
                     return json_encode(array(
                         'status' => 'locked',
                         'message' => 'Your account is locked. Please try again after ' . $remaining_minutes . ' minute(s).',
@@ -72,20 +72,23 @@ class Login extends DBConnection {
                         }
                     }
                     $this->settings->set_userdata('login_type', 1);
-                    return json_encode(array('status' => 'success'));
+    
+                    // Successful login, no need to send remaining_time
+                    return json_encode(array('status' => 'success', 'remaining_time' => null));
                 } else {
-                    return json_encode(array('status' => 'error', 'message' => 'User data retrieval failed.'));
+                    return json_encode(array('status' => 'error', 'message' => 'User data retrieval failed.', 'remaining_time' => null));
                 }
             } else {
                 // Increment failed attempts if login fails
                 $this->incrementFailedAttempts($username);
-                return json_encode(array('status' => 'incorrect', 'message' => 'Incorrect username or password.'));
+    
+                // Incorrect login attempt, no need to send remaining_time
+                return json_encode(array('status' => 'incorrect', 'message' => 'Incorrect username or password.', 'remaining_time' => null));
             }
         } else {
-            return json_encode(array('status' => 'incorrect', 'message' => 'User does not exist.'));
+            return json_encode(array('status' => 'incorrect', 'message' => 'User does not exist.', 'remaining_time' => null));
         }
     }
-    
     
 
     private function incrementFailedAttempts($username) {

@@ -1,4 +1,9 @@
-<?php require_once('../config.php') ?>
+
+<?php require_once('../config.php') 
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php require_once('inc/header.php') ?>

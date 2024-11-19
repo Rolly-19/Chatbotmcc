@@ -27,27 +27,35 @@ $(document).ready(function(){
 		start_loader()
 		if($('.err_msg').length > 0)
 			$('.err_msg').remove()
+	
 		$.ajax({
-			url:_base_url_+'classes/Login.php?f=login',
-			method:'POST',
-			data:$(this).serialize(),
-			error:err=>{
+			url: _base_url_ + 'classes/Login.php?f=login',
+			method: 'POST',
+			data: $(this).serialize(),
+			error: err => {
 				console.log(err)
-
 			},
-			success:function(resp){
-				if(resp){
+			success: function(resp) {
+				if (resp) {
 					resp = JSON.parse(resp)
-					if(resp.status == 'success'){
-						location.replace(_base_url_+'admin');
-					}else if(resp.status == 'incorrect'){
+					if (resp.status == 'success') {
+						location.replace(_base_url_ + 'admin');
+					} else if (resp.status == 'incorrect') {
 						var _frm = $('#login-frm')
-						var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-exclamation-triangle'></i> Incorrect email or password</div>"
+						var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-exclamation-triangle'></i> Incorrect username or password</div>"
 						_frm.prepend(_msg)
 						_frm.find('input').addClass('is-invalid')
 						$('[name="username"]').focus()
+					} else if (resp.status == 'locked_out') {
+						var _frm = $('#login-frm')
+						var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-lock'></i> " + resp.message + "</div>"
+						_frm.prepend(_msg)
+						_frm.find('input').prop('disabled', true); // Disable form inputs temporarily
+						setTimeout(function() {
+							_frm.find('input').prop('disabled', false); // Enable inputs after 1 minute
+						}, 60000); // 1 minute lockout time
 					}
-						end_loader()
+					end_loader()
 				}
 			}
 		})

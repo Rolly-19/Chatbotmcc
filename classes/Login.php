@@ -15,7 +15,7 @@ class Login extends DBConnection {
     public function index(){
         echo "<h1>Access Denied</h1> <a href='".base_url."'>Go Back.</a>";
     }
-    public function login(){
+    public function login() {
         extract($_POST);
     
         // Using prepared statements to prevent SQL injection
@@ -27,8 +27,22 @@ class Login extends DBConnection {
         if ($qry->num_rows > 0) {
             $user = $qry->fetch_assoc();
     
-            // Check if the provided password matches the hashed password in the database
+            // Check if the user is locked out due to too many failed attempts
+            $attempt_time = strtotime($user['last_attempt']);
+            $current_time = time();
+            $max_attempts = 3;
+            $lockout_time = 60; // 1 minute lockout period
+    
+            // If attempts are more than allowed and lockout period is not passed
+            if ($user['login_attempts'] >= $max_attempts && ($current_time - $attempt_time) < $lockout_time) {
+                return json_encode(array('status' => 'locked_out', 'message' => 'Too many failed login attempts. Please try again after 1 minute.'));
+            }
+    
+            // If the provided password matches the hashed password in the database
             if (password_verify($password, $user['password'])) {
+                // Reset login attempts on successful login
+                $this->reset_login_attempts($user['id']);
+    
                 // Set user data in session or some other storage
                 foreach ($user as $k => $v) {
                     if (!is_numeric($k) && $k != 'password') {
@@ -42,7 +56,8 @@ class Login extends DBConnection {
                 // Return success message as JSON
                 return json_encode(array('status' => 'success'));
             } else {
-                // Password does not match
+                // Increment login attempts and record the last attempt time
+                $this->increment_login_attempts($user['id']);
                 return json_encode(array('status' => 'incorrect'));
             }
         } else {
@@ -50,6 +65,19 @@ class Login extends DBConnection {
             return json_encode(array('status' => 'incorrect'));
         }
     }
+    
+    private function increment_login_attempts($user_id) {
+        $stmt = $this->conn->prepare("UPDATE users SET login_attempts = login_attempts + 1, last_attempt = NOW() WHERE id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+    }
+    
+    private function reset_login_attempts($user_id) {
+        $stmt = $this->conn->prepare("UPDATE users SET login_attempts = 0, last_attempt = NULL WHERE id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+    }
+    
     public function logout(){
         if($this->settings->sess_des()){
             redirect('admin/login.php');

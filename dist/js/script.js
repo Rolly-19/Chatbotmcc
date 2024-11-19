@@ -22,36 +22,69 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 
 $(document).ready(function(){
 	// Login
-	$('#login-frm').submit(function(e){
-		e.preventDefault()
-		start_loader()
-		if($('.err_msg').length > 0)
-			$('.err_msg').remove()
+	$('#login-frm').submit(function(e) {
+		e.preventDefault();
+		start_loader();
+	
+		// Remove any previous error message
+		if ($('.err_msg').length > 0) {
+			$('.err_msg').remove();
+		}
+	
 		$.ajax({
-			url:_base_url_+'classes/Login.php?f=login',
-			method:'POST',
-			data:$(this).serialize(),
-			error:err=>{
-				console.log(err)
-
+			url: _base_url_ + 'classes/Login.php?f=login',
+			method: 'POST',
+			data: $(this).serialize(),
+			error: function(err) {
+				console.log(err);
 			},
-			success:function(resp){
-				if(resp){
-					resp = JSON.parse(resp)
-					if(resp.status == 'success'){
-						location.replace(_base_url_+'admin');
-					}else if(resp.status == 'incorrect'){
-						var _frm = $('#login-frm')
-						var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-exclamation-triangle'></i> Incorrect email or password</div>"
-						_frm.prepend(_msg)
-						_frm.find('input').addClass('is-invalid')
-						$('[name="username"]').focus()
+			success: function(resp) {
+				if (resp) {
+					resp = JSON.parse(resp);
+	
+					// Successful login
+					if (resp.status == 'success') {
+						location.replace(_base_url_ + 'admin');
+					} 
+					// Incorrect username or password
+					else if (resp.status == 'incorrect') {
+						var _frm = $('#login-frm');
+						var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-exclamation-triangle'></i> Incorrect username or password.</div>";
+						_frm.prepend(_msg);
+						_frm.find('input').addClass('is-invalid');
+						$('[name="username"]').focus();
+						end_loader();
+					} 
+					// Account is locked, show remaining time
+					else if (resp.status == 'locked') {
+						var _frm = $('#login-frm');
+	
+						// Create the message for the lockout
+						var _msg = "<div class='alert alert-danger text-white err_msg' id='lockout-msg'><i class='fa fa-exclamation-triangle'></i> " + resp.message + "</div>";
+						_frm.prepend(_msg);
+	
+						// Create a variable to store the remaining time in seconds
+						var remaining_time = resp.remaining_time;
+						
+						// Update the message with the remaining time every second
+						var timer = setInterval(function() {
+							if (remaining_time <= 0) {
+								clearInterval(timer);  // Stop the timer when the time is up
+							} else {
+								remaining_time--;
+								var minutes = Math.floor(remaining_time / 60);
+								var seconds = remaining_time % 60;
+								// Update the existing message with the remaining time
+								$('#lockout-msg').html("<i class='fa fa-exclamation-triangle'></i> Your account is locked. Please try again in " + minutes + " minute(s) and " + seconds + " second(s).");
+							}
+						}, 1000); // Update every second
+	
+						end_loader();
 					}
-						end_loader()
 				}
 			}
-		})
-	})
+		});
+	});
 	//Establishment Login
 	$('#flogin-frm').submit(function(e){
 		e.preventDefault()

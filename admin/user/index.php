@@ -28,6 +28,11 @@ foreach($user->fetch_array() as $k =>$v){
 					<input type="text" name="username" id="username" class="form-control" value="<?php echo isset($meta['username']) ? $meta['username']: '' ?>" required  autocomplete="off">
 				</div>
 				<div class="form-group">
+    <label for="phone">Phone Number</label>
+    <input type="text" name="phone" id="phone" class="form-control" value="<?php echo isset($meta['phone']) ? $meta['phone']: '' ?>" maxlength="11" required>
+</div>
+
+				<div class="form-group">
 					<label for="password">Password</label>
 					<div class="input-group">
 						<input type="password" name="password" id="password" class="form-control" value="" autocomplete="off">

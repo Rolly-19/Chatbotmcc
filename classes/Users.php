@@ -13,60 +13,70 @@ Class Users extends DBConnection {
 	public function save_users(){
 		extract($_POST);
 		$data = '';
+		
+		// Loop through POST data and prepare update data
 		foreach($_POST as $k => $v){
-			if(!in_array($k,array('id','password'))){
+			if(!in_array($k, array('id', 'password'))){
 				if(!empty($data)) $data .=" , ";
 				$data .= " {$k} = '{$v}' ";
 			}
 		}
+		
+		// Handle password hashing
 		if(!empty($password) && !empty($id)){
-			$password = md5($password);
+			// Use password_hash() instead of MD5
+			$password = password_hash($password, PASSWORD_DEFAULT);
+			
 			if(!empty($data)) $data .=" , ";
-			$data .= " `password` = '{$password}' ";
+			$data .= " password = '{$password}' ";
 		}
-
+	
+		// Handle avatar upload
 		if(isset($_FILES['img']) && $_FILES['img']['tmp_name'] != ''){
-				$fname = 'uploads/'.strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
-				$move = move_uploaded_file($_FILES['img']['tmp_name'],'../'. $fname);
-				if($move){
-					$data .=" , avatar = '{$fname}' ";
-					if(isset($_SESSION['userdata']['avatar']) && is_file('../'.$_SESSION['userdata']['avatar']))
-						unlink('../'.$_SESSION['userdata']['avatar']);
-				}
+			$fname = 'uploads/'.strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
+			$move = move_uploaded_file($_FILES['img']['tmp_name'],'../'. $fname);
+			if($move){
+				$data .=" , avatar = '{$fname}' ";
+				if(isset($_SESSION['userdata']['avatar']) && is_file('../'.$_SESSION['userdata']['avatar']))
+					unlink('../'.$_SESSION['userdata']['avatar']);
+			}
 		}
+		
+		// Insert or update user data
 		if(empty($id)){
+			// Insert query
 			$qry = $this->conn->query("INSERT INTO users set {$data}");
 			if($qry){
-				$this->settings->set_flashdata('success','User Details successfully saved.');
+				$this->settings->set_flashdata('success', 'User Details successfully saved.');
 				foreach($_POST as $k => $v){
 					if($k != 'id'){
 						if(!empty($data)) $data .=" , ";
-						$this->settings->set_userdata($k,$v);
+						$this->settings->set_userdata($k, $v);
 					}
 				}
 				return 1;
-			}else{
+			} else {
 				return 2;
 			}
-
-		}else{
+	
+		} else {
+			// Update query
 			$qry = $this->conn->query("UPDATE users set $data where id = {$id}");
 			if($qry){
-				$this->settings->set_flashdata('success','User Details successfully updated.');
+				$this->settings->set_flashdata('success', 'User Details successfully updated.');
 				foreach($_POST as $k => $v){
 					if($k != 'id'){
 						if(!empty($data)) $data .=" , ";
-						$this->settings->set_userdata($k,$v);
+						$this->settings->set_userdata($k, $v);
 					}
 				}
 				if(isset($fname) && isset($move))
-				$this->settings->set_userdata('avatar',$fname);
-
+					$this->settings->set_userdata('avatar', $fname);
+	
 				return 1;
-			}else{
+			} else {
 				return "UPDATE users set $data where id = {$id}";
 			}
-			
 		}
 	}
 	public function delete_users(){
@@ -88,10 +98,11 @@ Class Users extends DBConnection {
 				$data .= " `{$k}` = '{$v}' ";
 			}
 		}
-
-			if(!empty($password))
-			$data .= ", `password` = '".md5($password)."' ";
-		
+		if (!empty($password)) {
+			$hashedPassword = password_hash($password, PASSWORD_DEFAULT); // Hash the password
+			$data .= ", `password` = '{$hashedPassword}' ";
+		}
+	
 			if(isset($_FILES['img']) && $_FILES['img']['tmp_name'] != ''){
 				$fname = 'uploads/'.strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
 				$move = move_uploaded_file($_FILES['img']['tmp_name'],'../'. $fname);

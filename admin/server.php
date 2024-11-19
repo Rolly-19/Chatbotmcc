@@ -134,7 +134,7 @@ $con = mysqli_connect('localhost', 'u510162695_chatbot_db', '1Chatbot_db', 'u510
         }else{
             $code = 0;
             $email = $_SESSION['username']; //getting this email using session
-            $encpass = md5($password);
+            $encpass = password_hash($password, PASSWORD_DEFAULT);
             $update_pass = "UPDATE users SET OTP = $code, password = '$encpass' WHERE username = '$email'";
             $run_query = mysqli_query($con, $update_pass);
             if($run_query){

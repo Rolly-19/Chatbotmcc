@@ -17,23 +17,37 @@ class Login extends DBConnection {
     }
     public function login(){
         extract($_POST);
-
+    
         // Using prepared statements to prevent SQL injection
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ? AND password = md5(?)");
-        $stmt->bind_param("ss", $username, $password);
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
         $stmt->execute();
         $qry = $stmt->get_result();
-
-        if($qry->num_rows > 0){
-            foreach($qry->fetch_assoc() as $k => $v){
-                if(!is_numeric($k) && $k != 'password'){
-                    $this->settings->set_userdata($k,$v);
+    
+        if ($qry->num_rows > 0) {
+            $user = $qry->fetch_assoc();
+    
+            // Check if the provided password matches the hashed password in the database
+            if (password_verify($password, $user['password'])) {
+                // Set user data in session or some other storage
+                foreach ($user as $k => $v) {
+                    if (!is_numeric($k) && $k != 'password') {
+                        $this->settings->set_userdata($k, $v);
+                    }
                 }
+    
+                // Store the login type (1 could mean logged in)
+                $this->settings->set_userdata('login_type', 1);
+    
+                // Return success message as JSON
+                return json_encode(array('status' => 'success'));
+            } else {
+                // Password does not match
+                return json_encode(array('status' => 'incorrect'));
             }
-            $this->settings->set_userdata('login_type',1);
-            return json_encode(array('status'=>'success'));
-        }else{
-            return json_encode(array('status'=>'incorrect'));
+        } else {
+            // User not found
+            return json_encode(array('status' => 'incorrect'));
         }
     }
     public function logout(){

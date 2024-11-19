@@ -1,6 +1,6 @@
 <?php
-$servername = "u510162695_chatbot_db";
-$username = "root"; 
+$servername = "localhost";
+$username = "u510162695_chatbot_db"; 
 $password = "1Chatbot_db"; 
 $dbname = "u510162695_chatbot_db"; 
 

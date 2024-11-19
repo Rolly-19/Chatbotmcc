@@ -19,28 +19,42 @@ class Login extends DBConnection {
     public function index(){
         echo "<h1>Access Denied</h1> <a href='".base_url."'>Go Back.</a>";
     }
-    public function login(){
+    public function login() {
         extract($_POST);
+    
+        // Log incoming POST data for debugging
+        file_put_contents('login_debug.log', print_r($_POST, true), FILE_APPEND);
     
         // First, check if the user exists and retrieve failed attempts, last failed attempt timestamp, and password
         $stmt = $this->conn->prepare("SELECT failed_attempts, last_failed_attempt, password FROM users WHERE username = ?");
+        
+        if ($stmt === false) {
+            return json_encode(array('status' => 'error', 'message' => 'Prepare failed: ' . $this->conn->error));
+        }
+    
         $stmt->bind_param("s", $username);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            return json_encode(array('status' => 'error', 'message' => 'Execute failed: ' . $stmt->error));
+        }
+        
         $qry = $stmt->get_result();
     
         if ($qry->num_rows > 0) {
             $user = $qry->fetch_assoc();
     
+            // Debugging output: Check the values in $user
+            file_put_contents('login_debug.log', print_r($user, true), FILE_APPEND);
+    
             // If the account is locked (failed 3 times), check the lockout time
             if ($user['failed_attempts'] >= 3) {
                 $last_failed = strtotime($user['last_failed_attempt']);
                 $current_time = time();
-            
+    
                 // Lockout period (1 minute)
                 if ($current_time - $last_failed < 60) { // 60 seconds = 1 minute
                     $remaining_time = 60 - ($current_time - $last_failed); // Remaining time in seconds
                     $remaining_minutes = ceil($remaining_time / 60); // Convert to minutes
-            
+    
                     return json_encode(array(
                         'status' => 'locked',
                         'message' => 'Your account is locked. Please try again after ' . $remaining_minutes . ' minute(s).',
@@ -64,7 +78,7 @@ class Login extends DBConnection {
                 $qry = $stmt->get_result();
     
                 if ($qry->num_rows > 0) {
-                    // Set session data for the logged-in user, ensuring we don't overwrite existing session structure
+                    // Set session data for the logged-in user
                     $user_data = $qry->fetch_assoc();
                     foreach ($user_data as $k => $v) {
                         if (!is_numeric($k) && $k != 'password') {
@@ -85,7 +99,6 @@ class Login extends DBConnection {
             return json_encode(array('status' => 'incorrect', 'message' => 'User does not exist.'));
         }
     }
-    
     
 
     private function incrementFailedAttempts($username) {

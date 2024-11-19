@@ -24,13 +24,12 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 		// Login
 		$('#login-frm').submit(function(e) {
 			e.preventDefault();
-	
-			
+		
 			// Remove any previous error message
 			if ($('.err_msg').length > 0) {
 				$('.err_msg').remove();
 			}
-	
+		
 			$.ajax({
 				url: _base_url_ + 'classes/Login.php?f=login',
 				method: 'POST',
@@ -38,14 +37,17 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 				error: function(err) {
 					console.log("Error:", err); // Log error if request fails
 				},
-				success: function(resp) {
+				success: function(resp, textStatus, xhr) {
+					console.log("Response Status:", xhr.status); // Check HTTP status code
+					console.log("Response Headers:", xhr.getAllResponseHeaders()); // Check all response headers
+		
 					if (resp) {
 						resp = JSON.parse(resp);
-	
+		
 						// Log the full response and remaining time for debugging
 						console.log("Response:", resp);
 						console.log("Remaining time:", resp.remaining_time);
-	
+		
 						// Successful login
 						if (resp.status == 'success') {
 							location.replace(_base_url_ + 'admin');
@@ -67,14 +69,14 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 		
 							// Create a variable to store the remaining time in seconds
 							var remaining_time = resp.remaining_time;
-	
+		
 							// Validate remaining_time
 							if (isNaN(remaining_time) || remaining_time <= 0) {
 								clearInterval(timer);  // Clear any active timers if time is invalid
 								end_loader();
 								return;
 							}
-	
+		
 							// Update the message with the remaining time every second
 							var timer = setInterval(function() {
 								if (remaining_time <= 0) {
@@ -92,7 +94,6 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 					}
 				}
 			});
-			
 		});
 	//Establishment Login
 	$('#flogin-frm').submit(function(e){

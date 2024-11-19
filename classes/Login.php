@@ -17,67 +17,72 @@ class Login extends DBConnection {
     }
     public function login() {
         extract($_POST);
-    
-        // Using prepared statements to prevent SQL injection
+        
+        // Check attempts from session
+        session_start();
+        if (!isset($_SESSION['login_attempts'])) {
+            $_SESSION['login_attempts'] = 0;
+        }
+        
+        // Check if user is blocked
+        if (isset($_SESSION['login_blocked_until'])) {
+            if (time() < $_SESSION['login_blocked_until']) {
+                $wait_minutes = ceil(($_SESSION['login_blocked_until'] - time()) / 60);
+                return json_encode(array(
+                    'status' => 'blocked',
+                    'message' => "Please wait {$wait_minutes} minutes before trying again."
+                ));
+            } else {
+                // Reset if block time has passed
+                unset($_SESSION['login_blocked_until']);
+                $_SESSION['login_attempts'] = 0;
+            }
+        }
+        
+        // Check user credentials
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $qry = $stmt->get_result();
-    
+        
         if ($qry->num_rows > 0) {
             $user = $qry->fetch_assoc();
-    
-            // Check if the user is locked out due to too many failed attempts
-            $attempt_time = strtotime($user['last_attempt']);
-            $current_time = time();
-            $max_attempts = 3;
-            $lockout_time = 60; // 1 minute lockout period
-    
-            // If attempts are more than allowed and lockout period is not passed
-            if ($user['login_attempts'] >= $max_attempts && ($current_time - $attempt_time) < $lockout_time) {
-                return json_encode(array('status' => 'locked_out', 'message' => 'Too many failed login attempts. Please try again after 1 minute.'));
-            }
-    
-            // If the provided password matches the hashed password in the database
+            
+            // Verify password
             if (password_verify($password, $user['password'])) {
-                // Reset login attempts on successful login
-                $this->reset_login_attempts($user['id']);
-    
-                // Set user data in session or some other storage
+                // Reset attempts on successful login
+                $_SESSION['login_attempts'] = 0;
+                
+                // Set user session data
                 foreach ($user as $k => $v) {
                     if (!is_numeric($k) && $k != 'password') {
                         $this->settings->set_userdata($k, $v);
                     }
                 }
-    
-                // Store the login type (1 could mean logged in)
                 $this->settings->set_userdata('login_type', 1);
-    
-                // Return success message as JSON
+                
                 return json_encode(array('status' => 'success'));
-            } else {
-                // Increment login attempts and record the last attempt time
-                $this->increment_login_attempts($user['id']);
-                return json_encode(array('status' => 'incorrect'));
             }
-        } else {
-            // User not found
-            return json_encode(array('status' => 'incorrect'));
         }
+        
+        // Failed login attempt
+        $_SESSION['login_attempts']++;
+        
+        // Block user after 3 attempts
+        if ($_SESSION['login_attempts'] >= 3) {
+            $_SESSION['login_blocked_until'] = time() + (30 * 60); // 30 minutes
+            return json_encode(array(
+                'status' => 'blocked',
+                'message' => 'Too many failed attempts. Please try again in 30 minutes.'
+            ));
+        }
+        
+        $remaining = 3 - $_SESSION['login_attempts'];
+        return json_encode(array(
+            'status' => 'incorrect',
+            'message' => "Incorrect email or password. {$remaining} attempts remaining."
+        ));
     }
-    
-    private function increment_login_attempts($user_id) {
-        $stmt = $this->conn->prepare("UPDATE users SET login_attempts = login_attempts + 1, last_attempt = NOW() WHERE id = ?");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-    }
-    
-    private function reset_login_attempts($user_id) {
-        $stmt = $this->conn->prepare("UPDATE users SET login_attempts = 0, last_attempt = NULL WHERE id = ?");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-    }
-    
     public function logout(){
         if($this->settings->sess_des()){
             redirect('admin/login.php');

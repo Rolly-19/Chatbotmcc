@@ -22,44 +22,37 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 
 $(document).ready(function(){
 	// Login
-	$('#login-frm').submit(function(e){
-		e.preventDefault()
-		start_loader()
-		if($('.err_msg').length > 0)
-			$('.err_msg').remove()
-	
+	$('#login-frm').submit(function(e) {
+		e.preventDefault();
+		start_loader();
+		$('.err_msg').remove();
+		
 		$.ajax({
-			url: _base_url_ + 'classes/Login.php?f=login',
+			url: _base_url_+'classes/Login.php?f=login',
 			method: 'POST',
 			data: $(this).serialize(),
-			error: err => {
-				console.log(err)
-			},
 			success: function(resp) {
-				if (resp) {
-					resp = JSON.parse(resp)
-					if (resp.status == 'success') {
-						location.replace(_base_url_ + 'admin');
-					} else if (resp.status == 'incorrect') {
-						var _frm = $('#login-frm')
-						var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-exclamation-triangle'></i> Incorrect username or password</div>"
-						_frm.prepend(_msg)
-						_frm.find('input').addClass('is-invalid')
-						$('[name="username"]').focus()
-					} else if (resp.status == 'locked_out') {
-						var _frm = $('#login-frm')
-						var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-lock'></i> " + resp.message + "</div>"
-						_frm.prepend(_msg)
-						_frm.find('input').prop('disabled', true); // Disable form inputs temporarily
-						setTimeout(function() {
-							_frm.find('input').prop('disabled', false); // Enable inputs after 1 minute
-						}, 60000); // 1 minute lockout time
+				if(resp) {
+					resp = JSON.parse(resp);
+					if(resp.status == 'success') {
+						location.replace(_base_url_+'admin');
+					} else {
+						var _frm = $('#login-frm');
+						var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-exclamation-triangle'></i> " + resp.message + "</div>";
+						_frm.prepend(_msg);
+						_frm.find('input').addClass('is-invalid');
+						$('[name="username"]').focus();
 					}
-					end_loader()
 				}
+				end_loader();
+			},
+			error: function(xhr, status, error) {
+				var _msg = "<div class='alert alert-danger text-white err_msg'><i class='fa fa-exclamation-triangle'></i> Login failed. Please try again.</div>";
+				$('#login-frm').prepend(_msg);
+				end_loader();
 			}
-		})
-	})
+		});
+	});
 	//Establishment Login
 	$('#flogin-frm').submit(function(e){
 		e.preventDefault()

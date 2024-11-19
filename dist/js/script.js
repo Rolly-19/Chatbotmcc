@@ -36,14 +36,16 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 				method: 'POST',
 				data: $(this).serialize(),
 				error: function(err) {
-					console.log(err);
+					console.log("Error:", err); // Log error if request fails
 				},
 				success: function(resp) {
 					if (resp) {
-						console.log("Response:", resp);
 						resp = JSON.parse(resp);
+	
+						// Log the full response and remaining time for debugging
+						console.log("Response:", resp);
 						console.log("Remaining time:", resp.remaining_time);
-			
+	
 						// Successful login
 						if (resp.status == 'success') {
 							location.replace(_base_url_ + 'admin');
@@ -55,30 +57,37 @@ window.alert_toast= function($msg = 'TEST',$bg = 'success' ,$pos=''){
 							_frm.prepend(_msg);
 							_frm.find('input').addClass('is-invalid');
 							$('[name="username"]').focus();
-							end_loader();
+							end_loader(); // Assuming this stops the loader
 						} 
 						// Account is locked, show remaining time
 						else if (resp.status == 'locked') {
 							var _frm = $('#login-frm');
 							var _msg = "<div class='alert alert-danger text-white err_msg' id='lockout-msg'><i class='fa fa-exclamation-triangle'></i> " + resp.message + "</div>";
 							_frm.prepend(_msg);
-			
-							// If remaining_time is not null, start the timer
-							if (resp.remaining_time !== null) {
-								var remaining_time = resp.remaining_time;
-			
-								var timer = setInterval(function() {
-									if (remaining_time <= 0) {
-										clearInterval(timer);
-									} else {
-										remaining_time--;
-										var minutes = Math.floor(remaining_time / 60);
-										var seconds = remaining_time % 60;
-										$('#lockout-msg').html("<i class='fa fa-exclamation-triangle'></i> Your account is locked. Please try again in " + minutes + " minute(s) and " + seconds + " second(s).");
-									}
-								}, 1000); // Update every second
+		
+							// Create a variable to store the remaining time in seconds
+							var remaining_time = resp.remaining_time;
+	
+							// Validate remaining_time
+							if (isNaN(remaining_time) || remaining_time <= 0) {
+								clearInterval(timer);  // Clear any active timers if time is invalid
+								end_loader();
+								return;
 							}
-							end_loader();
+	
+							// Update the message with the remaining time every second
+							var timer = setInterval(function() {
+								if (remaining_time <= 0) {
+									clearInterval(timer);  // Stop the timer when the time is up
+									end_loader(); // Stop loader when time is up
+								} else {
+									remaining_time--;
+									var minutes = Math.floor(remaining_time / 60);
+									var seconds = remaining_time % 60;
+									// Update the existing message with the remaining time
+									$('#lockout-msg').html("<i class='fa fa-exclamation-triangle'></i> Your account is locked. Please try again in " + minutes + " minute(s) and " + seconds + " second(s).");
+								}
+							}, 1000); // Update every second
 						}
 					}
 				}

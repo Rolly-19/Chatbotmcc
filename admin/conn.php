@@ -1,8 +1,8 @@
 <?php
-$servername = "localhost";
+$servername = "u510162695_chatbot_db";
 $username = "root"; 
-$password = ""; 
-$dbname = "chatbot_db"; 
+$password = "1Chatbot_db"; 
+$dbname = "u510162695_chatbot_db"; 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

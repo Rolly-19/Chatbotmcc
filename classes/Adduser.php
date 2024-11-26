@@ -218,6 +218,9 @@ class Adduser extends DBConnection {
             $firstname = $nameParts[0];
             $lastname = isset($nameParts[1]) ? $nameParts[1] : '';
     
+            // Initialize avatar_name to null
+            $avatar_name = null;
+    
             // Rest of the update method remains the same
             $id = intval($id);
             $firstname = $this->conn->real_escape_string($firstname);
@@ -247,9 +250,9 @@ class Adduser extends DBConnection {
             }
     
             // Handle avatar update (if provided)
-            if (isset($_FILES['avatar']) && $_FILES['avatar']['tmp_name'] != '') {
+            if (isset($_FILES['img']) && $_FILES['img']['tmp_name'] != '') {
                 $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                $fileMimeType = mime_content_type($_FILES['avatar']['tmp_name']);
+                $fileMimeType = mime_content_type($_FILES['img']['tmp_name']);
                 if (!in_array($fileMimeType, $allowedMimeTypes)) {
                     return 5; // Invalid file type
                 }
@@ -261,8 +264,8 @@ class Adduser extends DBConnection {
                 }
     
                 // Use a unique name for the avatar
-                $avatar_name = 'uploads/' . md5(time()) . '_' . $_FILES['avatar']['name'];
-                $move = move_uploaded_file($_FILES['avatar']['tmp_name'], '../' . $avatar_name);
+                $avatar_name = 'uploads/' . md5(time()) . '_' . $_FILES['img']['name'];
+                $move = move_uploaded_file($_FILES['img']['tmp_name'], '../' . $avatar_name);
                 if ($move) {
                     // Delete the old avatar if it exists
                     $old_avatar = $check_user->fetch_assoc()['avatar'];
@@ -280,6 +283,20 @@ class Adduser extends DBConnection {
             $update = $this->conn->query($sql);
     
             if ($update) {
+                // Update session data if the updated user is the logged-in user
+                if ($id == $_SESSION['userdata']['id']) {
+                    // Update session variables
+                    $_SESSION['userdata']['firstname'] = $firstname;
+                    $_SESSION['userdata']['lastname'] = $lastname;
+                    $_SESSION['userdata']['username'] = $username;
+                    $_SESSION['userdata']['phone'] = $phone;
+                    
+                    // Update avatar if a new one was uploaded
+                    if ($avatar_name !== null) {
+                        $_SESSION['userdata']['avatar'] = $avatar_name;
+                    }
+                }
+                
                 return 1; // Success
             } else {
                 return 2; // Database error

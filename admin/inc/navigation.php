@@ -75,6 +75,12 @@
                   <p>Unanswered List</p>
                 </a>
               </li>
+              <li class="nav-item dropdown">
+                <a href="<?php echo base_url ?>admin/?page=manage_admin" class="nav-link nav-manageadmin">
+                  <i class="nav-icon fas fa-question-circle"></i>
+                  <p>Manage Admin</p>
+                </a>
+              </li>
             </ul>
           </nav>
           <!-- /.sidebar-menu -->

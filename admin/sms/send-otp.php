@@ -124,17 +124,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Verification</title>
     <style>
+        /* Apply background to the entire body */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
+            background-image: url('../wave.png'); /* Replace with your background image path */
+            background-size: cover;
+            background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
         }
+        
+        /* Styling for the container that holds the content */
         .container {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9); /* Slight transparency for better contrast */
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -142,17 +147,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
             max-width: 400px;
         }
+
+        /* Logo styling */
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 100px; /* Adjust size of logo */
+            height: auto;
+        }
+
         h2 {
             margin-bottom: 20px;
             font-size: 24px;
             color: #333;
         }
+
         label {
             font-size: 16px;
             color: #333;
             display: block;
             margin-bottom: 8px;
         }
+
         input[type="tel"] {
             padding: 10px;
             width: 85%;
@@ -161,6 +179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 5px;
             margin-bottom: 20px;
         }
+
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -171,13 +190,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             cursor: pointer;
             transition: background-color 0.3s, transform 0.3s;
         }
+
         button:hover {
             background-color: #45a049;
             transform: translateY(-2px);
         }
+
         button:active {
             transform: translateY(0);
         }
+
         .instructions {
             font-size: 14px;
             color: #555;
@@ -208,26 +230,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+<div class="container">
+        <!-- Place logo here at the top -->
+        <div class="logo">
+            <img src="../logo.png" alt="Logo"> <!-- Replace with your logo path -->
+        </div>
 
-    <div class="container">
         <h2>Enter Your Phone Number</h2>
+        
         <?php if ($error): ?>
-        <div class="error"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
-    
-    <?php if ($success): ?>
-        <div class="success"><?php echo htmlspecialchars($success); ?></div>
-    <?php endif; ?>
+            <div class="error"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+
+        <?php if ($success): ?>
+            <div class="success"><?php echo htmlspecialchars($success); ?></div>
+        <?php endif; ?>
+        
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-            <input type="tel" id="phone" name="phone" pattern="[0-9]*" required placeholder="Enter your phone number (e.g., 09123456789)"  maxlength="11">
+            <input type="tel" id="phone" name="phone" pattern="[0-9]*" required placeholder="Enter your phone number (e.g., 09123456789)" maxlength="11">
             <button type="submit">Send OTP</button>
         </form>
+
         <div class="instructions">
             <p>Please enter your 11-digit phone number. An OTP will be sent to this number.</p>
         </div>
 
         <div class="login">
-            <a href="../choose-forgotpass.php"> Back to Login</a>
+            <a href="../login.php">Back to Login</a>
         </div>
     </div>
     <script>

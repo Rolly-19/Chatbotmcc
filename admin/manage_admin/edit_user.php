@@ -190,7 +190,7 @@ $(document).ready(function() {
                     case '1':
                         alert_toast("Data successfully updated.", 'success');
                         setTimeout(function() {
-                            location.href = "?page=manage_admin/users";
+                            location.href = "?page=manage_admin/index";
                         }, 2000);
                         break;
                     case '2':

@@ -1,24 +1,16 @@
-<?php 
-$id = isset($_GET['id']) ? $_GET['id'] : null;
-if (!$id) {
-    die("No user ID provided.");
-}
-?>
 <div class="card card-outline card-primary">
     <div class="card-body">
         <div class="container-fluid">
             <div id="msg"></div>
-            <form action="" id="edit-user" enctype="multipart/form-data">
-            <input type="hidden" name="id" id="userId" value="<?php echo isset($id) ? $id : ''; ?>">
-
+            <form action="" id="manage-user" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="">
                 
                 <!-- First Name -->
                 <div class="form-group">
                     <label for="firstname">First Name</label>
                     <input type="text" name="firstname" id="firstname" class="form-control" 
                            required pattern="[A-Za-z\s]+" 
-                           title="Please enter a valid first name (letters and spaces only)"
-                           value="<?php echo isset($firstname) ? $firstname : ''; ?>">
+                           title="Please enter a valid first name (letters and spaces only)">
                 </div>
                 
                 <!-- Last Name -->
@@ -26,28 +18,24 @@ if (!$id) {
                     <label for="lastname">Last Name</label>
                     <input type="text" name="lastname" id="lastname" class="form-control" 
                            required pattern="[A-Za-z\s]+" 
-                           title="Please enter a valid last name (letters and spaces only)"
-                           value="<?php echo isset($lastname) ? $lastname : ''; ?>">
+                           title="Please enter a valid last name (letters and spaces only)">
                 </div>
 
-               <!-- Email (Username) -->
+                <!-- Username -->
                 <div class="form-group">
                     <label for="username">Email</label>
-                    <input type="email" name="username" id="username" class="form-control" 
-                        required minlength="4" 
-                        title="Please enter a valid email address"
-                        autocomplete="off"
-                        value="<?php echo isset($username) ? $username : ''; ?>">
+                    <input type="text" name="username" id="username" class="form-control" 
+                           required minlength="4" 
+                           title="Username must be at least 4 characters long"
+                           autocomplete="off">
                 </div>
-
 
                 <!-- Phone -->
                 <div class="form-group">
                     <label for="phone">Phone Number</label>
                     <input type="text" name="phone" id="phone" class="form-control" 
                            required maxlength="11" pattern="[0-9]{11}" 
-                           title="Please enter a valid 11-digit phone number"
-                           value="<?php echo isset($phone) ? $phone : ''; ?>">
+                           title="Please enter a valid 11-digit phone number">
                 </div>
 
                 <!-- Password -->
@@ -91,7 +79,7 @@ if (!$id) {
     <div class="card-footer">
         <div class="col-md-12">
             <div class="row">
-                <button class="btn btn-sm btn-primary" form="edit-user">Update</button>
+                <button class="btn btn-sm btn-primary" form="manage-user">Save</button>
             </div>
         </div>
     </div>
@@ -108,41 +96,9 @@ function displayImg(input, _this) {
     }
 }
 
-$(document).ready(function() {
-    let userId = $('#userId').val();
-    if (userId) {
-        $.ajax({
-            url: _base_url_ + "classes/Adduser.php?f=get_user", // Ensure correct endpoint
-            method: 'POST',
-            data: { id: userId },
-            dataType: 'json', // Expect JSON response
-            success: function(response) {
-                if (response.status === 'success') {
-                    const user = response.data;
-                    $('#firstname').val(user.firstname);
-                    $('#lastname').val(user.lastname);
-                    $('#username').val(user.username);
-                    $('#phone').val(user.phone);
-                    if (user.avatar) {
-                        $('#cimg').attr('src', _base_url_ + user.avatar);
-                    }
-                } else {
-                    alert_toast(response.message || "Error loading user data", 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error: ", error);
-                console.error(xhr.responseText); // Log detailed error for debugging
-                alert_toast("An error occurred while fetching user data", 'error');
-            }
-        });
-    }
-});
-
-    
-
+$(document).ready(function () {
     // Handle password toggle
-    $('#toggle-password').click(function() {
+    $('#toggle-password').click(function () {
         const passwordInput = $('#password');
         const icon = $(this).find('i');
 
@@ -156,46 +112,42 @@ $(document).ready(function() {
     });
 
     // Handle form submission
-    $('#edit-user').submit(function(e) {
-    e.preventDefault();
-    
-    // Client-side validation
-    let form = this;
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return false;
-    }
+    $('#manage-user').submit(function (e) {
+        e.preventDefault();
+        
+        // Client-side validation
+        let form = this;
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return false;
+        }
 
-    // Show loading state
-    start_loader();
-    $('.btn-primary').attr('disabled', true);
+        // Show loading state
+        start_loader();
+        $('.btn-primary').attr('disabled', true);
 
-    // Create FormData object
-    let formData = new FormData($(this)[0]);
-    
-    // MODIFICATION: Separate first and last name
-    let fullName = $('#firstname').val() + ' ' + $('#lastname').val();
-    formData.set('name', fullName);
-
-    $.ajax({
-        url: _base_url_ + "classes/Adduser.php?f=update",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        method: 'POST',
-        type: 'POST',
-        success: function(resp) {
+        // Create FormData object
+        let formData = new FormData($(this)[0]);
+        
+        $.ajax({
+            url: _base_url_+"classes/Adduser.php?f=save",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST',
+            success: function(resp) {
                 resp = resp.trim();
                 switch(resp) {
                     case '1':
-                        alert_toast("Data successfully updated.", 'success');
+                        alert_toast("Data successfully saved.", 'success');
                         setTimeout(function() {
-                            location.href = "?page=manage_admin/index";
+                            location.reload();
                         }, 2000);
                         break;
                     case '2':
-                        alert_toast("An error occurred while updating the data.", 'error');
+                        alert_toast("An error occurred while saving the data.", 'error');
                         break;
                     case '3':
                         alert_toast("Please fill in all required fields.", 'warning');
@@ -219,5 +171,5 @@ $(document).ready(function() {
             }
         });
     });
-
+});
 </script>

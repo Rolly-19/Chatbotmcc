@@ -24,9 +24,12 @@ foreach($user->fetch_array() as $k =>$v){
 					<input type="text" name="lastname" id="lastname" class="form-control" value="<?php echo isset($meta['lastname']) ? $meta['lastname']: '' ?>" required>
 				</div>
 				<div class="form-group">
-					<label for="username">Username</label>
-					<input type="text" name="username" id="username" class="form-control" value="<?php echo isset($meta['username']) ? $meta['username']: '' ?>" required  autocomplete="off">
-				</div>
+    <label for="username">Email</label>
+    <input type="email" name="username" id="username" class="form-control" 
+           value="<?php echo isset($meta['username']) ? $meta['username']: '' ?>" 
+           required autocomplete="off">
+</div>
+
 				<div class="form-group">
     <label for="phone">Phone Number</label>
     <input type="text" name="phone" id="phone" class="form-control" value="<?php echo isset($meta['phone']) ? $meta['phone']: '' ?>" maxlength="11" required>
@@ -92,24 +95,33 @@ foreach($user->fetch_array() as $k =>$v){
 	});
 
 	$('#manage-user').submit(function(e){
-		e.preventDefault();
-		start_loader()
-		$.ajax({
-			url:_base_url_+'classes/Users.php?f=save',
-			data: new FormData($(this)[0]),
-		    cache: false,
-		    contentType: false,
-		    processData: false,
-		    method: 'POST',
-		    type: 'POST',
-			success:function(resp){
-				if(resp ==1){
-					location.reload()
-				}else{
-					$('#msg').html('<div class="alert alert-danger">Username already exist</div>')
-					end_loader()
-				}
-			}
-		})
-	})
+    e.preventDefault();
+    
+    // Client-side email validation
+    var email = $('#username').val();
+    var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailPattern.test(email)) {
+        $('#msg').html('<div class="alert alert-danger">Please enter a valid email address.</div>');
+        return false;
+    }
+    
+    start_loader();
+    $.ajax({
+        url: _base_url_ + 'classes/Users.php?f=save',
+        data: new FormData($(this)[0]),
+        cache: false,
+        contentType: false,
+        processData: false,
+        method: 'POST',
+        type: 'POST',
+        success: function(resp) {
+            if (resp == 1) {
+                location.reload();
+            } else {
+                $('#msg').html('<div class="alert alert-danger">Username already exists</div>');
+                end_loader();
+            }
+        }
+    });
+});
 </script>

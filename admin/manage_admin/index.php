@@ -28,7 +28,7 @@
 						<th>#</th>
 						<th>Avatar</th>
 						<th>Name</th>
-						<th>Username</th>
+						<th>Email</th>
 						<th>Phone</th>
 						<th>Date Created</th>
 						<th>Action</th>

@@ -21,14 +21,15 @@
                            title="Please enter a valid last name (letters and spaces only)">
                 </div>
 
-                <!-- Username -->
+                <!-- Email -->
                 <div class="form-group">
-                    <label for="username">Email</label>
-                    <input type="text" name="username" id="username" class="form-control" 
-                           required minlength="4" 
-                           title="Username must be at least 4 characters long"
-                           autocomplete="off">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" 
+                        required minlength="4" 
+                        title="Please enter a valid email address" 
+                        autocomplete="off">
                 </div>
+
 
                 <!-- Phone -->
                 <div class="form-group">

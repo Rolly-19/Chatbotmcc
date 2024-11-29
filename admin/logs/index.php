@@ -88,9 +88,9 @@
             <ul class="progress-tracker">
                 <?php
                 $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "chatbot_db";
+                $username = "u510162695_chatbot_db";
+                $password = "1Chatbot_db";
+                $dbname = "u510162695_chatbot_db";
 
                 // Create connection
                 $conn = new mysqli($servername, $username, $password, $dbname);

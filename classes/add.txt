@@ -77,15 +77,10 @@ class Adduser extends DBConnection {
                 }
             }
     
-            // Generate a random ID if it's a new user
+            // Insert or update user
             if (empty($id)) {
-                do {
-                    $random_id = random_int(100000, 999999); // Generate a random 6-digit ID
-                    $check_id = $this->conn->query("SELECT id FROM users WHERE id = {$random_id}");
-                } while ($check_id->num_rows > 0); // Ensure ID is unique
-    
-                $data = "id = {$random_id}, " . $data; // Include the random ID in the data
-                $sql = "INSERT INTO users SET {$data}"; // Insert new user
+                // Insert new user
+                $sql = "INSERT INTO users SET {$data}";
                 $save = $this->conn->query($sql);
             } else {
                 // Update existing user

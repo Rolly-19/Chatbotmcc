@@ -1,9 +1,14 @@
 <?php if($_settings->chk_flashdata('success')): ?>
 <script>
-	alert_toast("<?php echo $_settings->flashdata('success') ?>",'success')
+	Swal.fire({
+		icon: 'success',
+		title: 'Success',
+		text: "<?php echo $_settings->flashdata('success') ?>",
+		showConfirmButton: false,
+		timer: 2000
+	});
 </script>
-<?php endif;?>
-
+<?php endif; ?>
 <style>
 	img#cimg,img#cimg2,img#cimg3{
 		height: 15vh;

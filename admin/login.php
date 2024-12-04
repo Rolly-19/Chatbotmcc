@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php require_once('inc/header.php') ?>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
 <body class="hold-transition login-page" style="background-image: url('wave.png'); background-size: cover; background-position: center;">
   <script>
     start_loader()
@@ -33,10 +33,10 @@
             </div>
           </div>
         </div>
-        <div class="g-recaptcha mb-3" data-sitekey="6LeZaY0qAAAAAESaP72J2eGi8aalnNZsRMTCsP4P"></div>
+        <!-- <div class="g-recaptcha mb-3" data-sitekey="6LeZaY0qAAAAAESaP72J2eGi8aalnNZsRMTCsP4P"></div> -->
         <div class="row">
           <div class="col-12">
-            <a href="3ways.php" class="text-left">Forgot Password?</a>
+            <a href="<?php echo base_url ?>admin/3ways" class="text-left">Forgot Password?</a>
           </div>
         </div>
         <div class="row">

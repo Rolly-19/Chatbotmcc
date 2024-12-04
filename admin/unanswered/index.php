@@ -1,9 +1,15 @@
 
 <?php if($_settings->chk_flashdata('success')): ?>
 <script>
-	alert_toast("<?php echo $_settings->flashdata('success') ?>",'success')
+	Swal.fire({
+		icon: 'success',
+		title: 'Success',
+		text: "<?php echo $_settings->flashdata('success') ?>",
+		showConfirmButton: false,
+		timer: 2000
+	});
 </script>
-<?php endif;?>
+<?php endif; ?>
 <div class="card card-outline card-primary">
 	<div class="card-header">
 		<h3 class="card-title">List of Unanswered Questions</h3>

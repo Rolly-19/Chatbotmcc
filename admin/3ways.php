@@ -68,10 +68,10 @@
             </div>
             <h1 class="page-title">Account Security</h1>
             <p class="text-center mb-4">Choose an option below to secure your account.</p>
-            <a href="forgot-password.php" class="utility-btn">
+            <a href="forgot-password" class="utility-btn">
                 Reset Password
             </a>
-            <a href="sms/send-otp.php" class="utility-btn">
+            <a href="sms/send-otp" class="utility-btn">
                 Generate OTP
             </a>
         </div>

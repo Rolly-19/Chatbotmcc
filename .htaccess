@@ -8,31 +8,21 @@ RewriteRule ^(.*)$    /index.php/$2/?page=$1   [L]
 
 
 
-<IfModule mod_headers.c>
+<IfModule mod_rewrite.c>
 
-# Enable Strict-Transport-Security to enforce HTTPS
-Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+RewriteEngine on
 
-# Prevent Clickjacking attacks
-Header set X-Frame-Options "SAMEORIGIN"
+# Remove .php extension
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
 
-# Prevent MIME-sniffing
-Header set X-Content-Type-Options "nosniff"
-
-# Control Referer information
-Header set Referrer-Policy "no-referrer-when-downgrade"
-
-# Limit features to prevent abuse
-Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-
-# Add Content-Security-Policy (customized to allow required resources)
-Header set Content-Security-Policy "
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://ajax.googleapis.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    img-src 'self' data: https://your-external-images.com;
-    font-src 'self' https://fonts.gstatic.com;
-    connect-src 'self' https://api.mccchat.com;
-"
+# Route requests to index.php if the file or directory doesn't exist
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.php?page=$1 [L]
 
 </IfModule>
+
+
+

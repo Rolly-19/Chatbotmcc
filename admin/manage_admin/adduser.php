@@ -1,3 +1,13 @@
+<?php if($_settings->chk_flashdata('success')): ?>
+<script>
+	Swal.fire({
+		icon: 'success',
+		title: 'Success',
+		text: "<?php echo $_settings->flashdata('success') ?>",
+		showConfirmButton: false,
+		timer: 2000
+	});
+</script>
 <div class="card card-outline card-primary">
     <div class="card-body">
         <div class="container-fluid">

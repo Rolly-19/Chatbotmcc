@@ -76,17 +76,17 @@
                 </a>
               </li>
               <li class="nav-item dropdown">
-    <a href="<?php echo base_url ?>admin/?page=manage_admin" class="nav-link nav-manageadmin">
-        <i class="nav-icon fas fa-users-cog"></i> <!-- Updated icon -->
-        <p>Manage Admin</p>
-    </a>
-</li>
-<li class="nav-item dropdown">
-    <a href="<?php echo base_url ?>admin/?page=logs" class="nav-link nav-logs">
-        <i class="nav-icon fas fa-file-alt"></i> <!-- Changed icon to 'logs' icon -->
-        <p>Logs</p>
-    </a>
-</li>
+                <a href="<?php echo base_url ?>admin/?page=manage_admin" class="nav-link nav-manageadmin">
+                    <i class="nav-icon fas fa-users-cog"></i> <!-- Updated icon -->
+                    <p>Manage Admin</p>
+                </a>
+            </li>
+            li class="nav-item dropdown">
+                <a href="<?php echo base_url ?>admin/?page=logs" class="nav-link nav-logs">
+                    <i class="nav-icon fas fa-history"></i> <!-- Updated icon -->
+                    <p>Logs</p>
+                </a>
+            </li>
 
             </ul>
           </nav>

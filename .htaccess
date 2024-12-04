@@ -1,16 +1,6 @@
 <IfModule mod_rewrite.c>
 
 RewriteEngine on
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$    /index.php/$2/?page=$1   [L]
-</IfModule>
-
-
-
-<IfModule mod_rewrite.c>
-
-RewriteEngine on
 
 # Remove .php extension
 RewriteCond %{REQUEST_FILENAME} !-d
@@ -23,6 +13,66 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ /index.php?page=$1 [L]
 
 </IfModule>
+
+# Security headers
+
+# Content Security Policy (CSP)
+<IfModule mod_headers.c>
+Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';"
+</IfModule>
+
+# HTTP Strict Transport Security (HSTS)
+<IfModule mod_headers.c>
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+</IfModule>
+
+# X-Frame-Options
+<IfModule mod_headers.c>
+Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# X-Content-Type-Options
+<IfModule mod_headers.c>
+Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# Referrer Policy
+<IfModule mod_headers.c>
+Header set Referrer-Policy "no-referrer-when-downgrade"
+</IfModule>
+
+# Permissions Policy (formerly Feature Policy)
+<IfModule mod_headers.c>
+Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), fullscreen=(self)"
+</IfModule>
+
+# Disable directory browsing
+Options -Indexes
+
+# Disable server signature
+ServerSignature Off
+
+# Prevent MIME type sniffing
+<IfModule mod_headers.c>
+Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# Prevent access to sensitive files
+<FilesMatch "\.(env|htaccess|htpasswd|ini|log|sh|bak)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Limit request methods
+<LimitExcept GET POST HEAD>
+    Deny from all
+</LimitExcept>
+
+# Protect against clickjacking
+<IfModule mod_headers.c>
+Header always set X-Frame-Options "DENY"
+</IfModule>
+
 
 
 

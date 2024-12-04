@@ -17,35 +17,3 @@ RewriteRule ^(.*)$ /mccchat/admin/index.php?page=$1 [L]
 
 
 
-# HTTP Strict Transport Security (HSTS)
-<IfModule mod_headers.c>
-Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-</IfModule>
-
-# X-Frame-Options
-<IfModule mod_headers.c>
-Header always set X-Frame-Options "SAMEORIGIN"
-</IfModule>
-
-# X-Content-Type-Options
-<IfModule mod_headers.c>
-Header set X-Content-Type-Options "nosniff"
-</IfModule>
-
-# Referrer Policy
-<IfModule mod_headers.c>
-Header set Referrer-Policy "no-referrer-when-downgrade"
-</IfModule>
-
-# Permissions Policy (relaxed to avoid issues)
-<IfModule mod_headers.c>
-Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), fullscreen=(self)"
-</IfModule>
-
-# Disable directory browsing
-Options -Indexes
-
-# Prevent MIME type sniffing
-<IfModule mod_headers.c>
-Header set X-Content-Type-Options "nosniff"
-</IfModule>

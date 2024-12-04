@@ -21,15 +21,14 @@
                            title="Please enter a valid last name (letters and spaces only)">
                 </div>
 
-                <!-- Email -->
+                <!-- Username -->
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" name="email" id="email" class="form-control" 
-                        required minlength="4" 
-                        title="Please enter a valid email address" 
-                        autocomplete="off">
+                    <label for="username">Email</label>
+                    <input type="text" name="username" id="username" class="form-control" 
+                           required minlength="4" 
+                           title="Username must be at least 4 characters long"
+                           autocomplete="off">
                 </div>
-
 
                 <!-- Phone -->
                 <div class="form-group">
@@ -54,7 +53,8 @@
                         </div>
                     </div>
                     <small class="form-text text-muted">
-                        <i>Password must be more than 8 characters long and include at least one special character.</i>
+                        <i>Leave this blank if you don't want to change the password. 
+                           New passwords must be at least 8 characters long.</i>
                     </small>
                 </div>
 

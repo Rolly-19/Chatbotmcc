@@ -65,9 +65,11 @@
     <!-- ./wrapper -->
    
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    
     <script>
       $.widget.bridge('uibutton', $.ui.button)
     </script>
+    
     <!-- Bootstrap 4 -->
     <script src="<?php echo base_url ?>plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- ChartJS -->

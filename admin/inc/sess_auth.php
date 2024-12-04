@@ -13,7 +13,7 @@ if(!isset($_SESSION['userdata']) && !strpos($link, 'login')){
 	redirect('admin/login');
 }
 if(isset($_SESSION['userdata']) && strpos($link, 'login')){
-	redirect('admin/index');
+	redirect('admin/index.php');
 }
 $module = array('','admin','faculty','student');
 if(isset($_SESSION['userdata']) && (strpos($link, 'index.php') || strpos($link, 'admin/')) && $_SESSION['userdata']['login_type'] !=  1){

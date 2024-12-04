@@ -256,7 +256,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <div class="login">
-            <a href="../login.php">Back to Login</a>
+            <a href="../login">Back to Login</a>
         </div>
     </div>
     <script>

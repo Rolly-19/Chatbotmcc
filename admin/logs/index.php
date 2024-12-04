@@ -85,7 +85,7 @@
                 </form>
             </div>
 
-            <ul class="progress-tracker">
+                <ul class="progress-tracker">
                 <?php
                 $servername = "localhost";
                 $username = "u510162695_chatbot_db"; 

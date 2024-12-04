@@ -1,0 +1,203 @@
+<?php
+// At the very top of the file
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Disable display_errors to prevent HTML error output
+ini_set('log_errors', 1);     // Enable error logging
+require_once('../config.php');
+
+class Adduser extends DBConnection {
+    private $settings;
+    
+    public function __construct() {
+        global $_settings;
+        $this->settings = $_settings;
+        parent::__construct();
+    }
+
+    public function __destruct() {
+        parent::__destruct();
+    }
+
+    // Removed duplicate fetch_users() method
+    public function fetch_users() {
+        try {
+            // Your code here for fetching users
+            error_log("Fetching users...");
+    
+            // Ensure no output has been sent before
+            if (headers_sent($filename, $linenum)) {
+                throw new Exception("Headers already sent in $filename on line $linenum");
+            }
+    
+            // Clear any previous output
+            ob_clean();
+    
+            // Set proper JSON headers
+            header('Content-Type: application/json');
+            header('Cache-Control: no-cache, must-revalidate');
+    
+            // Verify database connection
+            if (!$this->conn) {
+                throw new Exception("Database connection failed");
+            }
+    
+            // Run the query
+            $sql = "SELECT 
+                    u.id,
+                    u.avatar,
+                    CONCAT(u.firstname, ' ', u.lastname) as name,
+                    u.username,
+                    u.phone,
+                    DATE_FORMAT(u.date_created, '%M %d, %Y') as date_created
+                FROM users u 
+                ORDER BY u.firstname ASC";
+    
+            $qry = $this->conn->query($sql);
+    
+            if (!$qry) {
+                throw new Exception("Query failed: " . $this->conn->error);
+            }
+    
+            // Start creating response data
+            $data = array();
+            $i = 1;
+    
+            while ($row = $qry->fetch_assoc()) {
+                $avatar = isset($row['avatar']) && !empty($row['avatar']) && is_file('../' . $row['avatar'])
+                    ? $row['avatar']
+                    : 'uploads/default.png';
+    
+                $data[] = array(
+                    'index' => $i++,
+                    'id' => $row['id'],
+                    'avatar' => $avatar,
+                    'name' => $row['name'],
+                    'username' => $row['username'],
+                    'phone' => $row['phone'],
+                    'date_created' => $row['date_created']
+                );
+            }
+    
+            // Log the response before sending
+            error_log("Fetched data: " . json_encode($data));
+    
+            echo json_encode(array('status' => 'success', 'data' => $data));
+    
+        } catch (Exception $e) {
+            // Log the error message
+            error_log("Fetch users error: " . $e->getMessage());
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ));
+        }
+        exit;
+    }
+
+    public function save() {
+        try {
+            // Validate required fields
+            $required_fields = ['firstname', 'lastname', 'username', 'phone'];
+            foreach ($required_fields as $field) {
+                if (!isset($_POST[$field]) || empty($_POST[$field])) {
+                    return 3; // Return error code for missing fields
+                }
+            }
+
+            // Sanitize input
+            $firstname = $this->conn->real_escape_string($_POST['firstname']);
+            $lastname = $this->conn->real_escape_string($_POST['lastname']);
+            $username = $this->conn->real_escape_string($_POST['username']);
+            $phone = $this->conn->real_escape_string($_POST['phone']);
+            $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+
+            // Check if username already exists
+            $check = $this->conn->query("SELECT * FROM users WHERE username = '{$username}' " . ($id > 0 ? " AND id != {$id} " : ""));
+            if ($check->num_rows > 0) {
+                return 4; // Return error code for duplicate username
+            }
+
+            // Prepare base data
+            $data = " firstname = '{$firstname}' ";
+            $data .= ", lastname = '{$lastname}' ";
+            $data .= ", username = '{$username}' ";
+            $data .= ", phone = '{$phone}' ";
+
+            // Handle password
+            if (!empty($_POST['password'])) {
+                $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                $data .= ", password = '{$password}' ";
+            }
+
+            // Handle avatar upload
+            if (isset($_FILES['img']) && $_FILES['img']['tmp_name'] != '') {
+                $upload_path = '../uploads/';
+                if (!is_dir($upload_path)) {
+                    mkdir($upload_path, 0777, true);
+                }
+
+                $fname = 'uploads/' . strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
+                $move = move_uploaded_file($_FILES['img']['tmp_name'], '../' . $fname);
+                if ($move) {
+                    $data .= ", avatar = '{$fname}' ";
+                    // Delete old avatar if exists
+                    if ($id > 0) {
+                        $old_avatar = $this->conn->query("SELECT avatar FROM users WHERE id = {$id}")->fetch_assoc()['avatar'] ?? '';
+                        if (!empty($old_avatar) && is_file('../' . $old_avatar)) {
+                            unlink('../' . $old_avatar);
+                        }
+                    }
+                }
+            }
+
+            if (empty($id)) {
+                // Insert new user
+                $sql = "INSERT INTO users SET {$data}";
+                $save = $this->conn->query($sql);
+            } else {
+                // Update existing user
+                $sql = "UPDATE users SET {$data} WHERE id = {$id}";
+                $save = $this->conn->query($sql);
+            }
+
+            if ($save) {
+                return 1; // Success
+            } else {
+                return 2; // Database error
+            }
+
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return 2; // Return general error code
+        }
+    }
+}
+
+// Ensure we handle all requests with proper JSON responses
+try {
+    if (!isset($_GET['f'])) {
+        throw new Exception('No action specified');
+    }
+
+    $adduser = new Adduser();
+    $action = strtolower($_GET['f']);
+
+    switch ($action) {
+        case 'save':
+            $result = $adduser->save();
+            echo json_encode(['status' => ($result === 1 ? 'success' : 'error'), 'code' => $result]);
+            break;
+        case 'fetch':
+            $adduser->fetch_users();
+            break;
+        default:
+            throw new Exception('Invalid action specified');
+    }
+} catch (Exception $e) {
+    error_log("Request handling error: " . $e->getMessage());
+    echo json_encode([
+        'status' => 'error',
+        'message' => $e->getMessage()
+    ]);
+}
+?>

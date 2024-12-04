@@ -1,7 +1,9 @@
 <?php
 require_once '../config.php';
+
 class Login extends DBConnection {
     private $settings;
+
     public function __construct(){
         global $_settings;
         $this->settings = $_settings;
@@ -9,102 +11,108 @@ class Login extends DBConnection {
         parent::__construct();
         ini_set('display_error', 1);
     }
+
     public function __destruct(){
         parent::__destruct();
     }
+
     public function index(){
         echo "<h1>Access Denied</h1> <a href='".base_url."'>Go Back.</a>";
     }
-    public function login() {
+
+    public function login(){
         extract($_POST);
-        
-        // Initialize session if not already started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        // Initialize login attempts if not set
-        if (!isset($_SESSION['login_attempts'])) {
-            $_SESSION['login_attempts'] = 0;
-        }
-        
-        // Check credentials first - if correct, allow login regardless of attempts
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ?");
+
+        // First, check if the user exists and retrieve failed attempts and last failed attempt timestamp
+        $stmt = $this->conn->prepare("SELECT failed_attempts, last_failed_attempt FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $qry = $stmt->get_result();
-        
+
         if ($qry->num_rows > 0) {
             $user = $qry->fetch_assoc();
+
+            // If the account is locked (failed 3 times), check the lockout time
+            if ($user['failed_attempts'] >= 3) {
+                $last_failed = strtotime($user['last_failed_attempt']);
+                $current_time = time();
             
-            // If password is correct, allow login regardless of attempts
-            if (password_verify($password, $user['password'])) {
-                // Reset attempts on successful login
-                $_SESSION['login_attempts'] = 0;
-                unset($_SESSION['login_blocked_until']); // Remove any existing block
-                
-                // Set user session data
-                foreach ($user as $k => $v) {
-                    if (!is_numeric($k) && $k != 'password') {
-                        $this->settings->set_userdata($k, $v);
-                    }
+                // Lockout period (1 minute)
+                if ($current_time - $last_failed < 60) { // 60 seconds = 1 minute
+                    $remaining_time = 60 - ($current_time - $last_failed); // Remaining time in seconds
+                    $remaining_minutes = ceil($remaining_time / 60); // Convert to minutes
+            
+                    return json_encode(array(
+                        'status' => 'locked',
+                        'message' => 'Your account is locked. Please try again after ' . $remaining_minutes . ' minute(s).',
+                        'remaining_time' => $remaining_time // Send the remaining time in seconds
+                    ));
+                } else {
+                    // Reset the failed attempts after lockout period has passed
+                    $this->resetFailedAttempts($username);
                 }
-                $this->settings->set_userdata('login_type', 1);
-                
-                return json_encode(array('status' => 'success'));
             }
         }
-        
-        // If we reach here, the login attempt failed
-        // Check if user is currently blocked
-        if (isset($_SESSION['login_blocked_until'])) {
-            if (time() < $_SESSION['login_blocked_until']) {
-                $wait_minutes = ceil(($_SESSION['login_blocked_until'] - time()) / 60);
-                return json_encode(array(
-                    'status' => 'blocked',
-                    'message' => "Please wait {$wait_minutes} minutes before trying again."
-                ));
-            } else {
-                // Reset if block time has passed
-                unset($_SESSION['login_blocked_until']);
-                $_SESSION['login_attempts'] = 0;
+
+        // Now check the username and password
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ? AND password = md5(?)");
+        $stmt->bind_param("ss", $username, $password);
+        $stmt->execute();
+        $qry = $stmt->get_result();
+
+        if ($qry->num_rows > 0) {
+            // Reset failed attempts on successful login
+            $this->resetFailedAttempts($username);
+
+            // Set session data for the logged-in user
+            foreach ($qry->fetch_assoc() as $k => $v) {
+                if (!is_numeric($k) && $k != 'password') {
+                    $this->settings->set_userdata($k, $v);
+                }
             }
+            $this->settings->set_userdata('login_type', 1);
+            return json_encode(array('status' => 'success'));
+        } else {
+            // Increment failed attempts if login fails
+            $this->incrementFailedAttempts($username);
+            return json_encode(array('status' => 'incorrect', 'message' => 'Incorrect asdusername or password.'));
         }
-        
-        // Increment failed attempts
-        $_SESSION['login_attempts']++;
-        
-        // Block user after 3 attempts
-        if ($_SESSION['login_attempts'] >= 3) {
-            $_SESSION['login_blocked_until'] = time() + (5 * 60); // 5 minutes
-            return json_encode(array(
-                'status' => 'blocked',
-                'message' => 'Too many failed attempts. Please try again in 5 minutes.'
-            ));
-        }
-        
-        $remaining = 3 - $_SESSION['login_attempts'];
-        return json_encode(array(
-            'status' => 'incorrect',
-            'message' => "Incorrect email or password. {$remaining} attempts remaining."
-        ));
     }
+
+    private function incrementFailedAttempts($username) {
+        // Increment failed login attempts and set timestamp of the last failed attempt
+        $stmt = $this->conn->prepare("UPDATE users SET failed_attempts = failed_attempts + 1, last_failed_attempt = NOW() WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+    }
+
+    private function resetFailedAttempts($username) {
+        // Reset failed attempts after successful login or when lockout period has passed
+        $stmt = $this->conn->prepare("UPDATE users SET failed_attempts = 0, last_failed_attempt = NULL WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+    }
+
     public function logout(){
-        if($this->settings->sess_des()){
+        if ($this->settings->sess_des()) {
             redirect('admin/login.php');
         }
     }
 }
+
+// Check if there's an action to perform (like login or logout)
 $action = !isset($_GET['f']) ? 'none' : strtolower($_GET['f']);
 $auth = new Login();
+
 switch ($action) {
     case 'login':
-        echo $auth->login();
+        echo $auth->login(); // Call the login function
         break;
     case 'logout':
-        echo $auth->logout();
+        echo $auth->logout(); // Call the logout function
         break;
     default:
-        echo $auth->index();
+        echo $auth->index(); // Show access denied if no valid action
         break;
 }
+?>

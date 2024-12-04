@@ -30,15 +30,16 @@ if (!$id) {
                            value="<?php echo isset($lastname) ? $lastname : ''; ?>">
                 </div>
 
-                <!-- Username -->
+               <!-- Email (Username) -->
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" name="username" id="username" class="form-control" 
-                           required minlength="4" 
-                           title="Username must be at least 4 characters long"
-                           autocomplete="off"
-                           value="<?php echo isset($username) ? $username : ''; ?>">
+                    <label for="username">Email</label>
+                    <input type="email" name="username" id="username" class="form-control" 
+                        required minlength="4" 
+                        title="Please enter a valid email address"
+                        autocomplete="off"
+                        value="<?php echo isset($username) ? $username : ''; ?>">
                 </div>
+
 
                 <!-- Phone -->
                 <div class="form-group">

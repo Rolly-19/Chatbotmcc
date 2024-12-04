@@ -7,3 +7,25 @@ RewriteRule ^(.*)$    /index.php/$2/?page=$1   [L]
 </IfModule>
 
 
+
+<IfModule mod_headers.c>
+
+# Enable Strict-Transport-Security to enforce HTTPS
+Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+# Prevent Clickjacking attacks
+Header set X-Frame-Options "SAMEORIGIN"
+
+# Prevent MIME-sniffing
+Header set X-Content-Type-Options "nosniff"
+
+# Control Referer information
+Header set Referrer-Policy "no-referrer-when-downgrade"
+
+# Limit features to prevent abuse
+Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+# Add Content-Security-Policy (adjust as per your site's requirements)
+Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self';"
+
+</IfModule>

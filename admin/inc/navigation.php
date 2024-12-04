@@ -81,7 +81,7 @@
                     <p>Manage Admin</p>
                 </a>
             </li>
-            li class="nav-item dropdown">
+            <li class="nav-item dropdown">
                 <a href="<?php echo base_url ?>admin/?page=logs" class="nav-link nav-logs">
                     <i class="nav-icon fas fa-history"></i> <!-- Updated icon -->
                     <p>Logs</p>

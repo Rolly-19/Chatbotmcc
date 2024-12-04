@@ -16,10 +16,7 @@ RewriteRule ^(.*)$ /index.php?page=$1 [L]
 
 # Security headers
 
-# Content Security Policy (adjusted to allow third-party resources)
-<IfModule mod_headers.c>
-Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; object-src 'none';"
-</IfModule>
+
 
 # HTTP Strict Transport Security (HSTS)
 <IfModule mod_headers.c>

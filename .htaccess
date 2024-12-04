@@ -16,14 +16,14 @@ RewriteRule ^(.*)$ /index.php?page=$1 [L]
 
 # Security headers
 
-# Content Security Policy (CSP)
+# Content Security Policy (adjusted to allow third-party resources)
 <IfModule mod_headers.c>
-Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';"
+Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; object-src 'none';"
 </IfModule>
 
 # HTTP Strict Transport Security (HSTS)
 <IfModule mod_headers.c>
-Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 </IfModule>
 
 # X-Frame-Options
@@ -41,7 +41,7 @@ Header set X-Content-Type-Options "nosniff"
 Header set Referrer-Policy "no-referrer-when-downgrade"
 </IfModule>
 
-# Permissions Policy (formerly Feature Policy)
+# Permissions Policy (relaxed to avoid issues)
 <IfModule mod_headers.c>
 Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), fullscreen=(self)"
 </IfModule>
@@ -49,28 +49,9 @@ Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), fullscr
 # Disable directory browsing
 Options -Indexes
 
-# Disable server signature
-ServerSignature Off
-
 # Prevent MIME type sniffing
 <IfModule mod_headers.c>
 Header set X-Content-Type-Options "nosniff"
-</IfModule>
-
-# Prevent access to sensitive files
-<FilesMatch "\.(env|htaccess|htpasswd|ini|log|sh|bak)$">
-    Order Allow,Deny
-    Deny from all
-</FilesMatch>
-
-# Limit request methods
-<LimitExcept GET POST HEAD>
-    Deny from all
-</LimitExcept>
-
-# Protect against clickjacking
-<IfModule mod_headers.c>
-Header always set X-Frame-Options "DENY"
 </IfModule>
 
 

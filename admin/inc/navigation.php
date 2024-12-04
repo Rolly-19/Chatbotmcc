@@ -83,7 +83,7 @@
 </li>
 <li class="nav-item dropdown">
     <a href="<?php echo base_url ?>admin/?page=logs" class="nav-link nav-logs">
-        <i class="nav-icon fas fa-users-cog"></i> <!-- Updated icon -->
+    <i class="nav-icon fas fa-file-alt"></i> <!-- Changed icon to 'logs' icon -->
         <p>Logs</p>
     </a>
 </li>

@@ -25,7 +25,14 @@ Header set Referrer-Policy "no-referrer-when-downgrade"
 # Limit features to prevent abuse
 Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
 
-# Add Content-Security-Policy (adjust as per your site's requirements)
-Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self';"
+# Add Content-Security-Policy (customized to allow required resources)
+Header set Content-Security-Policy "
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://ajax.googleapis.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' data: https://your-external-images.com;
+    font-src 'self' https://fonts.gstatic.com;
+    connect-src 'self' https://api.mccchat.com;
+"
 
 </IfModule>

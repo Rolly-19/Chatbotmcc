@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php require_once('inc/header.php') ?>
-<script src="https://www.google.com/recaptcha/api.js?render=6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW"></script>
+<!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
 <body class="hold-transition login-page" style="background-image: url('wave.png'); background-size: cover; background-position: center;">
   <script>
     start_loader()
@@ -39,7 +39,6 @@
             <a href="<?php echo base_url ?>admin/3ways" class="text-left">Forgot Password?</a>
           </div>
         </div>
-        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
         <div class="row">
           <div class="col-6">
             <a href="<?php echo base_url ?>" class="btn btn-link">Go to Website</a>
@@ -61,30 +60,22 @@
 <script src="dist/js/adminlte.min.js"></script>
 
 <script>
-    $(document).ready(function(){
-      end_loader();
-
-      // reCAPTCHA v3 integration
-      grecaptcha.ready(function() {
-        grecaptcha.execute('YOUR_SITE_KEY', {action: 'login'}).then(function(token) {
-          document.getElementById('g-recaptcha-response').value = token;
-        });
-      });
-
-      // Existing password toggle code
-      $('#toggle-password').click(function(){
-        var passwordField = $('#password');
-        var passwordFieldType = passwordField.attr('type');
-        if (passwordFieldType === 'password') {
-          passwordField.attr('type', 'text');
-          $(this).removeClass('fa-eye').addClass('fa-eye-slash');
-        } else {
-          passwordField.attr('type', 'password');
-          $(this).removeClass('fa-eye-slash').addClass('fa-eye');
-        }
-      });
+  $(document).ready(function(){
+    end_loader();
+    
+    $('#toggle-password').click(function(){
+      var passwordField = $('#password');
+      var passwordFieldType = passwordField.attr('type');
+      if (passwordFieldType === 'password') {
+        passwordField.attr('type', 'text');
+        $(this).removeClass('fa-eye').addClass('fa-eye-slash');
+      } else {
+        passwordField.attr('type', 'password');
+        $(this).removeClass('fa-eye-slash').addClass('fa-eye');
+      }
     });
-  </script>
+  });
+</script>
 
 <style>
   .login-logo {

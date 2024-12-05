@@ -3,7 +3,6 @@ require_once '../config.php';
 
 class Login extends DBConnection {
     private $settings;
-    private $recaptcha_secret_key = '6LcT_pIqAAAAAMkQSZYz_LmgCfhsKKm1RT0YabnL'; // Replace with your actual secret key
 
     public function __construct() {
         global $_settings;
@@ -17,31 +16,12 @@ class Login extends DBConnection {
         parent::__destruct();
     }
 
-    // Added missing index method
     public function index() {
-        return json_encode([
-            'status' => 'error',
-            'message' => 'Invalid action'
-        ]);
-    }
-
-    private function verifyRecaptcha($token) {
-        $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$this->recaptcha_secret_key.'&response='.$token);
-        $responseData = json_decode($verifyResponse);
-        
-        return $responseData->success && $responseData->score > 0.5 && $responseData->action === 'login';
+        echo "<h1>Access Denied</h1> <a href='".base_url."'>Go Back.</a>";
     }
 
     public function login() {
         extract($_POST);
-    
-        // Verify reCAPTCHA first
-        if (!isset(${'g-recaptcha-response'}) || !$this->verifyRecaptcha(${'g-recaptcha-response'})) {
-            return json_encode([
-                'status' => 'error',
-                'message' => 'reCAPTCHA verification failed. Please try again.'
-            ]);
-        }
     
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -142,6 +122,7 @@ class Login extends DBConnection {
             exit;
         }
     }
+    
 }
 
 $action = !isset($_GET['f']) ? 'none' : strtolower($_GET['f']);

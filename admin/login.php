@@ -16,10 +16,10 @@
     <div class="card-body">
       <p class="login-box-msg">Sign in to start your session</p>
 
-      <form id="login-frm" action="" method="post">
+      <form id="login-frm" action="login.php" method="post">
   <input type="hidden" id="recaptchaToken" name="recaptchaToken">
   <div class="input-group mb-3">
-    <input type="email" class="form-control" name="username" placeholder="Email">
+    <input type="email" class="form-control" name="username" placeholder="Email" required>
     <div class="input-group-append">
       <div class="input-group-text">
         <span class="fas fa-user"></span>
@@ -27,62 +27,34 @@
     </div>
   </div>
   <div class="input-group mb-3">
-    <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+    <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
     <div class="input-group-append">
       <div class="input-group-text">
         <span id="toggle-password" class="fas fa-eye"></span>
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-12">
-      <a href="<?php echo base_url ?>admin/3ways" class="text-left">Forgot Password?</a>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-6">
-      <a href="<?php echo base_url ?>" class="btn btn-link">Go to Website</a>
-    </div>
-    <div class="col-6 text-right">
-      <button type="submit" class="btn btn-primary">Sign In</button>
-    </div>
-  </div>
+  <button type="submit" class="btn btn-primary">Sign In</button>
 </form>
 
-    </div>
-  </div>
-</div>
-
-<!-- jQuery -->
-<script src="plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
-<script src="dist/js/adminlte.min.js"></script>
-
-<script src="https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW"></script>
 <script>
   grecaptcha.ready(function() {
     grecaptcha.execute('6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW', { action: 'login' }).then(function(token) {
       document.getElementById('recaptchaToken').value = token;
     });
   });
-</script>
-<script>
-  $(document).ready(function(){
-    end_loader();
-    
-    $('#toggle-password').click(function(){
-      var passwordField = $('#password');
-      var passwordFieldType = passwordField.attr('type');
-      if (passwordFieldType === 'password') {
-        passwordField.attr('type', 'text');
-        $(this).removeClass('fa-eye').addClass('fa-eye-slash');
-      } else {
-        passwordField.attr('type', 'password');
-        $(this).removeClass('fa-eye-slash').addClass('fa-eye');
-      }
-    });
+
+  document.getElementById("login-frm").addEventListener("submit", function(event) {
+    const recaptchaTokenField = document.getElementById('recaptchaToken');
+
+    if (!recaptchaTokenField.value) {
+        event.preventDefault();
+        grecaptcha.execute('6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW', { action: 'login' }).then(function(token) {
+            recaptchaTokenField.value = token;
+            document.getElementById("login-frm").submit();
+        });
+    }
   });
 </script>
 

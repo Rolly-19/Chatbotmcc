@@ -23,6 +23,21 @@ class Login extends DBConnection {
     public function login() {
         extract($_POST);
     
+        // Verify reCAPTCHA token with Google
+        $recaptchaSecret = '6LcT_pIqAAAAAMkQSZYz_LmgCfhsKKm1RT0YabnL'; // Replace with your secret key from Google
+        $recaptchaResponse = $recaptchaToken;
+        $recaptchaURL = 'https://www.google.com/recaptcha/api/siteverify';
+    
+        $response = file_get_contents($recaptchaURL . "?secret={$recaptchaSecret}&response={$recaptchaResponse}");
+        $responseKeys = json_decode($response, true);
+    
+        if (!$responseKeys["success"] || $responseKeys["score"] < 0.5 || $responseKeys["action"] !== "login") {
+            return json_encode([
+                'status' => 'recaptcha_failed',
+                'message' => 'reCAPTCHA validation failed. Please try again.'
+            ]);
+        }
+    
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -88,7 +103,6 @@ class Login extends DBConnection {
             'message' => "Incorrect email or password. {$remaining} attempts remaining."
         ]);
     }
-
     public function logout() {
         // Initialize session if not already started
         if (session_status() === PHP_SESSION_NONE) {

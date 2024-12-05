@@ -22,12 +22,23 @@ class Login extends DBConnection {
 
     public function login() {
         extract($_POST);
-        
-        // Verify reCAPTCHA
+    
         $recaptchaSecret = "6LcT_pIqAAAAAMkQSZYz_LmgCfhsKKm1RT0YabnL"; // Replace with your secret key
         $recaptchaToken = $_POST['recaptchaToken'] ?? '';
+    
+        if (empty($recaptchaToken)) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'No reCAPTCHA token received.'
+            ]);
+        }
+    
+        // Verify reCAPTCHA token with Google
         $recaptchaResponse = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$recaptchaSecret}&response={$recaptchaToken}");
         $recaptchaResult = json_decode($recaptchaResponse, true);
+    
+        // Log for debugging
+        error_log("reCAPTCHA Response: " . print_r($recaptchaResult, true));
     
         if (!$recaptchaResult['success'] || $recaptchaResult['score'] < 0.5) {
             return json_encode([
@@ -36,6 +47,7 @@ class Login extends DBConnection {
             ]);
         }
     
+        // Continue with login logic...
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }

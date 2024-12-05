@@ -17,6 +17,14 @@ class Login extends DBConnection {
         parent::__destruct();
     }
 
+    // Added missing index method
+    public function index() {
+        return json_encode([
+            'status' => 'error',
+            'message' => 'Invalid action'
+        ]);
+    }
+
     private function verifyRecaptcha($token) {
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$this->recaptcha_secret_key.'&response='.$token);
         $responseData = json_decode($verifyResponse);
@@ -101,32 +109,6 @@ class Login extends DBConnection {
         ]);
     }
 
-        }
-    
-        if (isset($_SESSION['login_blocked_until']) && time() < $_SESSION['login_blocked_until']) {
-            $wait_minutes = ceil(($_SESSION['login_blocked_until'] - time()) / 60);
-            return json_encode([
-                'status' => 'blocked',
-                'message' => "Please wait {$wait_minutes} minutes before trying again."
-            ]);
-        }
-    
-        $_SESSION['login_attempts']++;
-        if ($_SESSION['login_attempts'] >= 3) {
-            $_SESSION['login_blocked_until'] = time() + (5 * 60);
-            return json_encode([
-                'status' => 'blocked',
-                'message' => 'Too many failed attempts. Please try again in 5 minutes.'
-            ]);
-        }
-    
-        $remaining = 3 - $_SESSION['login_attempts'];
-        return json_encode([
-            'status' => 'incorrect',
-            'message' => "Incorrect email or password. {$remaining} attempts remaining."
-        ]);
-    
-
     public function logout() {
         // Initialize session if not already started
         if (session_status() === PHP_SESSION_NONE) {
@@ -160,8 +142,7 @@ class Login extends DBConnection {
             exit;
         }
     }
-    
-
+}
 
 $action = !isset($_GET['f']) ? 'none' : strtolower($_GET['f']);
 $auth = new Login();

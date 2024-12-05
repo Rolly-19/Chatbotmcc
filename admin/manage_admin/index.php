@@ -96,7 +96,7 @@ $(document).ready(function() {
     // Function to load users
     function loadUsers() {
         $.ajax({
-            url: _base_url_+"classes/Adduser.php?f=fetch", // Make sure this URL is correct
+            url: _base_url_+"classes/Adduser.php?f=fetch",
             method: 'GET',
             dataType: 'json',
             cache: false,
@@ -125,7 +125,7 @@ $(document).ready(function() {
                             <td>${user.date_added || ''}</td>
                             <td class="text-center">
                                 <div class="dropdown">
-                                    <button class="btn btn-info  dropdown-toggle" type="button" id="dropdownMenuButton${user.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton${user.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Actions
                                     </button>
                                     <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuButton${user.id}">
@@ -163,55 +163,93 @@ $(document).ready(function() {
                     // Add click event for delete button
                     $('.delete_user').click(function() {
                         const userId = $(this).data('id');
-                        if (confirm("Are you sure you want to delete this user?")) {
-                            $.ajax({
-                                url: _base_url_ + "classes/Adduser.php?f=delete&id=" + userId,
-                                method: 'GET',
-                                success: function(response) {
-                                    if (response == 1) {
-                                        alert_toast("User deleted successfully", 'success');
-                                        loadUsers(); // Reload the user table
-                                    } else if (response == 2) {
-                                        alert_toast("An error occurred while deleting the user", 'error');
-                                    } else if (response == 3) {
-                                        alert_toast("User not found", 'warning');
-                                    } else {
-                                        alert_toast("Unknown error occurred", 'error');
+                        
+                        // SweetAlert confirmation dialog
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: _base_url_ + "classes/Adduser.php?f=delete&id=" + userId,
+                                    method: 'GET',
+                                    success: function(response) {
+                                        if (response == 1) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Deleted!',
+                                                text: 'User has been deleted successfully.',
+                                                timer: 2000,
+                                                timerProgressBar: true
+                                            });
+                                            loadUsers(); // Reload the user table
+                                        } else if (response == 2) {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error',
+                                                text: 'An error occurred while deleting the user'
+                                            });
+                                        } else if (response == 3) {
+                                            Swal.fire({
+                                                icon: 'warning',
+                                                title: 'Not Found',
+                                                text: 'User not found'
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Unknown Error',
+                                                text: 'An unknown error occurred'
+                                            });
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'Error deleting user'
+                                        });
+                                        console.error("AJAX Error: ", error);
                                     }
-                                },
-                                error: function(xhr, status, error) {
-                                    alert_toast("Error deleting user", 'error');
-                                    console.error("AJAX Error: ", error);
-                                }
-                            });
-                        }
+                                });
+                            }
+                        });
                     });
                 } else {
-                    console.error('Error in response:', response);  // Log error if response is not as expected
-                    alert_toast("Error loading users: " + (response.message || 'Unknown error'), 'error');
+                    console.error('Error in response:', response);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: "Error loading users: " + (response.message || 'Unknown error')
+                    });
                 }
             },
             error: function(xhr, status, error) {
-                console.log('AJAX Error:', xhr.responseText, status, error);  // Log full error details
+                console.log('AJAX Error:', xhr.responseText, status, error);
 
                 let errorMessage = 'An error occurred while fetching users';
                 try {
                     let response = JSON.parse(xhr.responseText);
                     errorMessage = response.message || errorMessage;
                 } catch(e) {
-                    // If we can't parse JSON, show the first 100 characters of the response
                     errorMessage += ': ' + xhr.responseText.substring(0, 100);
                 }
-                alert_toast(errorMessage, 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage
+                });
             }
         });
     }
 
     // Load users when page loads
     loadUsers();
-
-
-    
 });
 
 

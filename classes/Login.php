@@ -3,6 +3,7 @@ require_once '../config.php';
 
 class Login extends DBConnection {
     private $settings;
+    private $recaptcha_secret_key = '6LcT_pIqAAAAAMkQSZYz_LmgCfhsKKm1RT0YabnL'; // Replace with your actual secret key
 
     public function __construct() {
         global $_settings;
@@ -16,39 +17,21 @@ class Login extends DBConnection {
         parent::__destruct();
     }
 
-    public function index() {
-        echo "<h1>Access Denied</h1> <a href='".base_url."'>Go Back.</a>";
+    private function verifyRecaptcha($token) {
+        $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$this->recaptcha_secret_key.'&response='.$token);
+        $responseData = json_decode($verifyResponse);
+        
+        return $responseData->success && $responseData->score > 0.5 && $responseData->action === 'login';
     }
 
     public function login() {
         extract($_POST);
     
-        // Verify reCAPTCHA token
-        $recaptchaSecret = '6LcT_pIqAAAAAMkQSZYz_LmgCfhsKKm1RT0YabnL'; // Your secret key
-        $recaptchaResponse = $_POST['recaptchaToken'] ?? null;
-    
-        if (!$recaptchaResponse) {
+        // Verify reCAPTCHA first
+        if (!isset(${'g-recaptcha-response'}) || !$this->verifyRecaptcha(${'g-recaptcha-response'})) {
             return json_encode([
                 'status' => 'error',
-                'message' => 'reCAPTCHA validation failed: Token is missing.'
-            ]);
-        }
-    
-        $recaptchaURL = 'https://www.google.com/recaptcha/api/siteverify';
-        $response = @file_get_contents($recaptchaURL . "?secret={$recaptchaSecret}&response={$recaptchaResponse}");
-        if (!$response) {
-            return json_encode([
-                'status' => 'error',
-                'message' => 'Unable to validate reCAPTCHA. Please try again later.'
-            ]);
-        }
-    
-        $responseKeys = json_decode($response, true);
-    
-        if (!$responseKeys["success"] || $responseKeys["score"] < 0.5 || $responseKeys["action"] !== "login") {
-            return json_encode([
-                'status' => 'recaptcha_failed',
-                'message' => 'reCAPTCHA validation failed. Please try again.'
+                'message' => 'reCAPTCHA verification failed. Please try again.'
             ]);
         }
     
@@ -56,9 +39,42 @@ class Login extends DBConnection {
             session_start();
         }
     
-        // Login attempts logic
         if (!isset($_SESSION['login_attempts'])) {
             $_SESSION['login_attempts'] = 0;
+        }
+    
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $qry = $stmt->get_result();
+    
+        if ($qry->num_rows > 0) {
+            $user = $qry->fetch_assoc();
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['login_attempts'] = 0;
+                unset($_SESSION['login_blocked_until']);
+    
+                $stmt = $this->conn->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+                $stmt->bind_param("i", $user['id']);
+                $stmt->execute();
+    
+                $stmt = $this->conn->prepare("INSERT INTO user_logins (user_id, time_in) VALUES (?, NOW())");
+                $stmt->bind_param("i", $user['id']);
+                $stmt->execute();
+                $_SESSION['user_login_id'] = $this->conn->insert_id;
+    
+                foreach ($user as $k => $v) {
+                    if (!is_numeric($k) && $k != 'password') {
+                        $this->settings->set_userdata($k, $v);
+                    }
+                }
+                $this->settings->set_userdata('login_type', 1);
+    
+                return json_encode([
+                    'status' => 'success',
+                    'message' => 'Login successful!'
+                ]);
+            }
         }
     
         if (isset($_SESSION['login_blocked_until']) && time() < $_SESSION['login_blocked_until']) {
@@ -69,36 +85,6 @@ class Login extends DBConnection {
             ]);
         }
     
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ?");
-        if (!$stmt) {
-            return json_encode(['status' => 'error', 'message' => 'Database error: ' . $this->conn->error]);
-        }
-    
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $qry = $stmt->get_result();
-    
-        if ($qry->num_rows > 0) {
-            $user = $qry->fetch_assoc();
-            if (password_verify($password, $user['password'])) {
-                // Reset failed attempts
-                $_SESSION['login_attempts'] = 0;
-                unset($_SESSION['login_blocked_until']);
-    
-                // Update last login
-                $stmt = $this->conn->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-                $stmt->bind_param("i", $user['id']);
-                $stmt->execute();
-    
-                // Log successful login
-                return json_encode([
-                    'status' => 'success',
-                    'message' => 'Login successful!'
-                ]);
-            }
-        }
-    
-        // Failed login logic
         $_SESSION['login_attempts']++;
         if ($_SESSION['login_attempts'] >= 3) {
             $_SESSION['login_blocked_until'] = time() + (5 * 60);
@@ -114,7 +100,32 @@ class Login extends DBConnection {
             'message' => "Incorrect email or password. {$remaining} attempts remaining."
         ]);
     }
-}
+
+        }
+    
+        if (isset($_SESSION['login_blocked_until']) && time() < $_SESSION['login_blocked_until']) {
+            $wait_minutes = ceil(($_SESSION['login_blocked_until'] - time()) / 60);
+            return json_encode([
+                'status' => 'blocked',
+                'message' => "Please wait {$wait_minutes} minutes before trying again."
+            ]);
+        }
+    
+        $_SESSION['login_attempts']++;
+        if ($_SESSION['login_attempts'] >= 3) {
+            $_SESSION['login_blocked_until'] = time() + (5 * 60);
+            return json_encode([
+                'status' => 'blocked',
+                'message' => 'Too many failed attempts. Please try again in 5 minutes.'
+            ]);
+        }
+    
+        $remaining = 3 - $_SESSION['login_attempts'];
+        return json_encode([
+            'status' => 'incorrect',
+            'message' => "Incorrect email or password. {$remaining} attempts remaining."
+        ]);
+    
 
     public function logout() {
         // Initialize session if not already started
@@ -149,7 +160,7 @@ class Login extends DBConnection {
             exit;
         }
     }
-
+    
 
 
 $action = !isset($_GET['f']) ? 'none' : strtolower($_GET['f']);

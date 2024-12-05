@@ -142,29 +142,55 @@ $(document).ready(function () {
                 resp = resp.trim();
                 switch(resp) {
                     case '1':
-                        alert_toast("Data successfully saved.", 'success');
-                        setTimeout(function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Data successfully saved.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
                             location.reload();
-                        }, 2000);
+                        });
                         break;
                     case '2':
-                        alert_toast("An error occurred while saving the data.", 'error');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while saving the data.'
+                        });
                         break;
                     case '3':
-                        alert_toast("Please fill in all required fields.", 'warning');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Warning',
+                            text: 'Please fill in all required fields.'
+                        });
                         break;
                     case '4':
-                        alert_toast("Username already exists.", 'warning');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Warning',
+                            text: 'Username already exists.'
+                        });
                         break;
                     default:
-                        alert_toast("An unknown error occurred.", 'error');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Unknown Error',
+                            text: 'An unknown error occurred.',
+                            footer: `<pre>${resp}</pre>`
+                        });
                         console.error(resp);
                         break;
                 }
             },
             error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred: ' + error
+                });
                 console.error(xhr.responseText);
-                alert_toast("An error occurred: " + error, 'error');
             },
             complete: function() {
                 end_loader();

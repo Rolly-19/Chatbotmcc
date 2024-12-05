@@ -98,6 +98,7 @@ if (!$id) {
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function displayImg(input, _this) {
     if (input.files && input.files[0]) {
@@ -113,10 +114,10 @@ $(document).ready(function() {
     let userId = $('#userId').val();
     if (userId) {
         $.ajax({
-            url: _base_url_ + "classes/Adduser.php?f=get_user", // Ensure correct endpoint
+            url: _base_url_ + "classes/Adduser.php?f=get_user",
             method: 'POST',
             data: { id: userId },
-            dataType: 'json', // Expect JSON response
+            dataType: 'json',
             success: function(response) {
                 if (response.status === 'success') {
                     const user = response.data;
@@ -128,19 +129,24 @@ $(document).ready(function() {
                         $('#cimg').attr('src', _base_url_ + user.avatar);
                     }
                 } else {
-                    alert_toast(response.message || "Error loading user data", 'error');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || "Error loading user data"
+                    });
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Error: ", error);
-                console.error(xhr.responseText); // Log detailed error for debugging
-                alert_toast("An error occurred while fetching user data", 'error');
+                console.error(xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: "An error occurred while fetching user data"
+                });
             }
         });
     }
-});
-
-    
 
     // Handle password toggle
     $('#toggle-password').click(function() {
@@ -158,61 +164,88 @@ $(document).ready(function() {
 
     // Handle form submission
     $('#edit-user').submit(function(e) {
-    e.preventDefault();
-    
-    // Client-side validation
-    let form = this;
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return false;
-    }
+        e.preventDefault();
+        
+        // Client-side validation
+        let form = this;
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return false;
+        }
 
-    // Show loading state
-    start_loader();
-    $('.btn-primary').attr('disabled', true);
+        // Show loading state
+        start_loader();
+        $('.btn-primary').attr('disabled', true);
 
-    // Create FormData object
-    let formData = new FormData($(this)[0]);
-    
-    // MODIFICATION: Separate first and last name
-    let fullName = $('#firstname').val() + ' ' + $('#lastname').val();
-    formData.set('name', fullName);
+        // Create FormData object
+        let formData = new FormData($(this)[0]);
+        
+        // Separate first and last name
+        let fullName = $('#firstname').val() + ' ' + $('#lastname').val();
+        formData.set('name', fullName);
 
-    $.ajax({
-        url: _base_url_ + "classes/Adduser.php?f=update",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        method: 'POST',
-        type: 'POST',
-        success: function(resp) {
+        $.ajax({
+            url: _base_url_ + "classes/Adduser.php?f=update",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST',
+            success: function(resp) {
                 resp = resp.trim();
                 switch(resp) {
                     case '1':
-                        alert_toast("Data successfully updated.", 'success');
-                        setTimeout(function() {
-                            location.href = "?page=manage_admin/index";
-                        }, 2000);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: "Data successfully updated.",
+                            timer: 2000,
+                            timerProgressBar: true,
+                            didClose: () => {
+                                location.href = "?page=manage_admin/index";
+                            }
+                        });
                         break;
                     case '2':
-                        alert_toast("An error occurred while updating the data.", 'error');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: "An error occurred while updating the data."
+                        });
                         break;
                     case '3':
-                        alert_toast("Please fill in all required fields.", 'warning');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Warning',
+                            text: "Please fill in all required fields."
+                        });
                         break;
                     case '4':
-                        alert_toast("Username already exists.", 'warning');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Warning',
+                            text: "Username already exists."
+                        });
                         break;
                     default:
-                        alert_toast("An unknown error occurred.", 'error');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: "An unknown error occurred.",
+                            footer: `<pre>${resp}</pre>`
+                        });
                         console.error(resp);
                         break;
                 }
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
-                alert_toast("An error occurred: " + error, 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: "An error occurred: " + error
+                });
             },
             complete: function() {
                 end_loader();
@@ -220,5 +253,5 @@ $(document).ready(function() {
             }
         });
     });
-
+});
 </script>

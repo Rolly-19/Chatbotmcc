@@ -61,11 +61,11 @@
 
 <script src="https://www.google.com/recaptcha/api.js?render=6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW"></script>
 <script>
-  grecaptcha.ready(function() {
-    grecaptcha.execute('6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW', { action: 'login' }).then(function(token) {
-      document.getElementById('recaptchaToken').value = token;
-    });
-  });
+  // grecaptcha.ready(function() {
+  //   grecaptcha.execute('6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW', { action: 'login' }).then(function(token) {
+  //     document.getElementById('recaptchaToken').value = token;
+  //   });
+  // });
 
   document.getElementById("login-frm").addEventListener("submit", function(event) {
     const recaptchaTokenField = document.getElementById('recaptchaToken');

@@ -54,8 +54,7 @@
                         </div>
                     </div>
                     <small class="form-text text-muted">
-                        <i>Leave this blank if you don't want to change the password. 
-                           New passwords must be at least 8 characters long.</i>
+                        <i>The new password must be at least 8 characters long and contain at least 1 special character.</i>
                     </small>
                 </div>
 

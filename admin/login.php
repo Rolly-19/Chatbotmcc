@@ -60,7 +60,7 @@
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
 
-<script src="https://www.google.com/recaptcha/api.js?render=6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY"></script>
 <script>
   grecaptcha.ready(function() {
     grecaptcha.execute('6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW', { action: 'login' }).then(function(token) {

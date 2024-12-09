@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: url('wave.png') no-repeat center center fixed;
+            background: url('../wave.png') no-repeat center center fixed;
             background-size: cover;
             display: flex;
             justify-content: center;

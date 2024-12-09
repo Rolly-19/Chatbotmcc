@@ -87,52 +87,61 @@
 
                 <ul class="progress-tracker">
                 <?php
-                $servername = "localhost";
-                $username = "u510162695_chatbot_db"; 
-                $password = "1Chatbot_db"; 
-                $dbname = "u510162695_chatbot_db"; 
+                    $servername = "localhost";
+                    $username = "u510162695_chatbot_db";
+                    $password = "1Chatbot_db";
+                    $dbname = "u510162695_chatbot_db";
 
-                // Create connection
-                $conn = new mysqli($servername, $username, $password, $dbname);
+                    // Create connection
+                    $conn = new mysqli($servername, $username, $password, $dbname);
 
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
-
-                // Get the date filter values from POST request
-                $dateFrom = isset($_POST['date_from']) ? $_POST['date_from'] : null;
-                $dateTo = isset($_POST['date_to']) ? $_POST['date_to'] : null;
-
-                // Build the SQL query with date filtering
-                $sql = "SELECT ul.id, ul.user_id, u.firstname, u.lastname, ul.time_in, ul.time_out
-                        FROM user_logins ul
-                        INNER JOIN users u ON ul.user_id = u.id";
-
-                if ($dateFrom && $dateTo) {
-                    $sql .= " WHERE DATE(ul.time_in) BETWEEN '$dateFrom' AND '$dateTo'";
-                }
-
-                $sql .= " ORDER BY ul.time_in DESC";
-
-                $result = $conn->query($sql);
-
-                // Display the results as vertical progress steps
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<li>
-                                <span>User:</span> {$row['firstname']} {$row['lastname']}<br>
-                                <span>Time In:</span> {$row['time_in']}<br>
-                                <span>Time Out:</span> " . ($row['time_out'] ?? "N/A") . "
-                              </li>";
+                    // Check connection
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
                     }
-                } else {
-                    echo "<li>No records found for the selected date range.</li>";
-                }
 
-                // Close the connection
-                $conn->close();
-                ?>
+                    // Set timezone to Philippine Time for MySQL queries
+                    $conn->query("SET time_zone = '+08:00'");
+
+                    // Get the date filter values from POST request
+                    $dateFrom = isset($_POST['date_from']) ? $_POST['date_from'] : null;
+                    $dateTo = isset($_POST['date_to']) ? $_POST['date_to'] : null;
+
+                    // Validate date input
+                    if (!$dateFrom || !$dateTo) {
+                        echo "<li>Please provide both start and end dates to filter records.</li>";
+                        exit;
+                    }
+
+                    // Prepare SQL query with timezone conversion and date filtering
+                    $stmt = $conn->prepare("SELECT ul.id, ul.user_id, u.firstname, u.lastname, 
+                                                CONVERT_TZ(ul.time_in, '+00:00', '+08:00') AS time_in_pht, 
+                                                CONVERT_TZ(ul.time_out, '+00:00', '+08:00') AS time_out_pht
+                                            FROM user_logins ul
+                                            INNER JOIN users u ON ul.user_id = u.id
+                                            WHERE DATE(ul.time_in) BETWEEN ? AND ?
+                                            ORDER BY ul.time_in DESC");
+                    $stmt->bind_param('ss', $dateFrom, $dateTo);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+
+                    // Display the results as vertical progress steps
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<li>
+                                    <span>User:</span> {$row['firstname']} {$row['lastname']}<br>
+                                    <span>Time In:</span> {$row['time_in_pht']}<br>
+                                    <span>Time Out:</span> " . ($row['time_out_pht'] ?? "N/A") . "
+                                </li>";
+                        }
+                    } else {
+                        echo "<li>No records found for the selected date range.</li>";
+                    }
+
+                    // Close the connection
+                    $stmt->close();
+                    $conn->close();
+                    ?>
             </ul>
         </div>
     </div>

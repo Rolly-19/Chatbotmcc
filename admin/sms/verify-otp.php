@@ -38,14 +38,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Enter OTP</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+    font-family: Arial, sans-serif;
+    background: url('wave.png') no-repeat center center fixed;
+    background-size: cover; /* Ensures the image covers the entire screen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
         .container {
             background-color: #fff;
             padding: 40px;

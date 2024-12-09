@@ -5,6 +5,12 @@ if (!$id) {
     die("No user ID provided.");
 }
 ?>
+<style>
+    input[readonly] {
+    background-color: #e9ecef; /* Light gray background */
+    cursor: not-allowed;     /* Pointer indicates non-editable */
+}
+</style>
 <div class="card card-outline card-primary">
     <div class="card-body">
         <div class="container-fluid">
@@ -38,17 +44,20 @@ if (!$id) {
                         required minlength="4" 
                         title="Please enter a valid email address"
                         autocomplete="off"
+                        readonly
                         value="<?php echo isset($username) ? $username : ''; ?>">
                 </div>
+
 
 
                 <!-- Phone -->
                 <div class="form-group">
                     <label for="phone">Phone Number</label>
                     <input type="text" name="phone" id="phone" class="form-control" 
-                           required maxlength="11" pattern="[0-9]{11}" 
-                           title="Please enter a valid 11-digit phone number"
-                           value="<?php echo isset($phone) ? $phone : ''; ?>">
+                        required maxlength="11" pattern="[0-9]{11}" 
+                        title="Please enter a valid 11-digit phone number"
+                        readonly
+                        value="<?php echo isset($phone) ? $phone : ''; ?>">
                 </div>
 
                 <!-- Password -->

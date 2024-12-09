@@ -12,52 +12,24 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Query to retrieve all table names
-$showTablesQuery = "SHOW TABLES";
-$result = $conn->query($showTablesQuery);
+// Define the new user values
+$firstname = "Rolly";
+$lastname = "Recabar";
+$username = "recabarrolly@gmail.com";
+$password = password_hash("rollyrecabar", PASSWORD_BCRYPT); // Securely hash the password
+$otp = "";
+$phone = "09631064348";
+$avatar = NULL; // Optional: Set to NULL if no avatar
+$dateAdded = date("Y-m-d H:i:s");
 
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_array()) {
-        $tableName = $row[0];
-        echo "<h2>Table: $tableName</h2>";
+// Insert the user into the database
+$sql = "INSERT INTO users (firstname, lastname, username, password, OTP, phone, avatar, date_added) 
+        VALUES ('$firstname', '$lastname', '$username', '$password', '$otp', '$phone', '$avatar', '$dateAdded')";
 
-        // Query to retrieve table contents
-        $selectQuery = "SELECT * FROM $tableName";
-        $tableResult = $conn->query($selectQuery);
-
-        if ($tableResult && $tableResult->num_rows > 0) {
-            // Display table headers dynamically
-            echo "<table border='1' cellspacing='0' cellpadding='10'>";
-            echo "<tr>";
-            while ($field = $tableResult->fetch_field()) {
-                echo "<th>" . htmlspecialchars($field->name) . "</th>";
-            }
-            echo "</tr>";
-
-            // Display table rows
-            while ($row = $tableResult->fetch_assoc()) {
-                echo "<tr>";
-                foreach ($row as $key => $value) {
-                    if (strpos($key, 'avatar') !== false || strpos($key, 'logo') !== false || strpos($key, 'IMAGE') !== false) {
-                        // Check for image columns
-                        if ($value) {
-                            echo "<td><img src='$value' alt='$key' style='max-width: 50px; max-height: 50px;'></td>";
-                        } else {
-                            echo "<td>N/A</td>";
-                        }
-                    } else {
-                        echo "<td>" . htmlspecialchars($value) . "</td>";
-                    }
-                }
-                echo "</tr>";
-            }
-            echo "</table>";
-        } else {
-            echo "<p>No records found in table '$tableName'.</p>";
-        }
-    }
+if ($conn->query($sql) === TRUE) {
+    echo "New user added successfully!";
 } else {
-    echo "<p>No tables found in the database.</p>";
+    echo "Error: " . $sql . "<br>" . $conn->error;
 }
 
 // Close the connection

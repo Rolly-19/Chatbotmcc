@@ -38,17 +38,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Enter OTP</title>
     <style>
         body {
-    font-family: Arial, sans-serif;
-    background: url('wave.png') no-repeat center center fixed;
-    background-size: cover; /* Ensures the image covers the entire screen */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+            font-family: Arial, sans-serif;
+            background: url('wave.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
         .container {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9); /* Adds a translucent white background for readability */
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -102,8 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: red;
             margin-bottom: 20px;
         }
-    /* Add this to your existing styles */
-    .success {
+        .success {
             color: green;
             margin-bottom: 20px;
             padding: 10px;
@@ -111,7 +110,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 5px;
             border: 1px solid #c8e6c9;
         }
-        
     </style>
 </head>
 <body>

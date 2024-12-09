@@ -24,16 +24,18 @@ foreach($user->fetch_array() as $k =>$v){
 					<input type="text" name="lastname" id="lastname" class="form-control" value="<?php echo isset($meta['lastname']) ? $meta['lastname']: '' ?>" required>
 				</div>
 				<div class="form-group">
-    <label for="username">Email</label>
-    <input type="email" name="username" id="username" class="form-control" 
-           value="<?php echo isset($meta['username']) ? $meta['username']: '' ?>" 
-           required autocomplete="off">
-</div>
+					<label for="username">Email</label>
+					<input type="email" name="username" id="username" class="form-control" 
+						value="<?php echo isset($meta['username']) ? $meta['username'] : '' ?>" 
+						required autocomplete="off" readonly>
+				</div>
 
 				<div class="form-group">
-    <label for="phone">Phone Number</label>
-    <input type="text" name="phone" id="phone" class="form-control" value="<?php echo isset($meta['phone']) ? $meta['phone']: '' ?>" maxlength="11" required>
-</div>
+					<label for="phone">Phone Number</label>
+					<input type="text" name="phone" id="phone" class="form-control" 
+						value="<?php echo isset($meta['phone']) ? $meta['phone'] : '' ?>" 
+						maxlength="11" required readonly>
+				</div>
 
 				<div class="form-group">
 					<label for="password">Password</label>
@@ -67,6 +69,10 @@ foreach($user->fetch_array() as $k =>$v){
 		</div>
 </div>
 <style>
+	input[readonly] {
+    background-color: #e9ecef; /* Light gray background */
+    cursor: not-allowed;     /* Pointer indicates non-editable */
+	}
 	img#cimg{
 		height: 15vh;
 		width: 15vh;

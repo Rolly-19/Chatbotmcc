@@ -92,11 +92,17 @@
   </div>
 </div>
 
-<!-- Include JavaScript Libraries -->
+<!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
-<script src="https://www.google.com/recaptcha/api.js?render=6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW"></script>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Bundle (includes Popper and JavaScript) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
   $(document).ready(function(){

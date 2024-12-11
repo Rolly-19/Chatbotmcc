@@ -17,50 +17,46 @@
       <p class="login-box-msg">Sign in to start your session</p>
 
       <form id="login-frm" action="" method="post">
-        <input type="hidden" id="recaptchaToken" name="recaptchaToken">
-        <div class="input-group mb-3">
-          <input type="email" class="form-control" name="username" placeholder="Email" required>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-user"></span>
-            </div>
-          </div>
-        </div>
-        <div class="input-group mb-3">
-          <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span id="toggle-password" class="fas fa-eye"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Terms and Conditions Checkbox -->
-        <div class="form-check mb-3">
+  <input type="hidden" id="recaptchaToken" name="recaptchaToken">
+  <div class="input-group mb-3">
+    <input type="email" class="form-control" name="username" placeholder="Email">
+    <div class="input-group-append">
+      <div class="input-group-text">
+        <span class="fas fa-user"></span>
+      </div>
+    </div>
+  </div>
+  <div class="input-group mb-3">
+    <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+    <div class="input-group-append">
+      <div class="input-group-text">
+        <span id="toggle-password" class="fas fa-eye"></span>
+      </div>
+    </div>
+  </div>
+  <div class="form-check mb-3">
           <input type="checkbox" class="form-check-input" id="terms_conditions" disabled>
           <label for="terms_conditions" class="form-check-label">
             I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>
           </label>
         </div>
-
-        <div class="row">
-          <div class="col-12">
-            <a href="<?php echo base_url ?>admin/3ways" class="text-left">Forgot Password?</a>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6">
-            <a href="<?php echo base_url ?>" class="btn btn-link">Go to Website</a>
-          </div>
-          <div class="col-6 text-right">
-            <button type="submit" class="btn btn-primary" id="login-btn" disabled>Sign In</button>
-          </div>
-        </div>
-      </form>
+  <div class="row">
+    <div class="col-12">
+      <a href="<?php echo base_url ?>admin/3ways" class="text-left">Forgot Password?</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <a href="<?php echo base_url ?>" class="btn btn-link">Go to Website</a>
+    </div>
+    <div class="col-6 text-right">
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </div>
+  </div>
+</form>
     </div>
   </div>
 </div>
-
 <!-- Terms and Conditions Modal -->
 <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -91,7 +87,6 @@
     </div>
   </div>
 </div>
-
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
@@ -104,6 +99,27 @@
 <!-- Bootstrap Bundle (includes Popper and JavaScript) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
+
+<script src="https://www.google.com/recaptcha/api.js?render=6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW"></script>
+<script>
+  grecaptcha.ready(function() {
+    grecaptcha.execute('6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW', { action: 'login' }).then(function(token) {
+      document.getElementById('recaptchaToken').value = token;
+    });
+  });
+
+  // document.getElementById("login-frm").addEventListener("submit", function(event) {
+  //   const recaptchaTokenField = document.getElementById('recaptchaToken');
+
+  //   if (!recaptchaTokenField.value) {
+  //       event.preventDefault();
+  //       grecaptcha.execute('6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW', { action: 'login' }).then(function(token) {
+  //           recaptchaTokenField.value = token;
+  //           document.getElementById("login-frm").submit();
+  //       });
+  //   }
+  // });
+</script>
 <script>
   $(document).ready(function(){
     // Show/hide password functionality
@@ -121,39 +137,43 @@
 
     // Enable checkbox and Sign-In button after accepting terms
     $('#acceptTerms').click(function () {
+      // Enable and check the checkbox
       $('#terms_conditions').prop('disabled', false).prop('checked', true);
+      // Enable the login button
       $('#login-btn').prop('disabled', false);
     });
 
-    // Ensure the loader ends properly
-    end_loader();
-  });
-
-  // ReCAPTCHA functionality
-  grecaptcha.ready(function() {
-    grecaptcha.execute('6LcT_pIqAAAAAIVwkx4EyPagkk-w-c0RhI-P-FLW', { action: 'login' }).then(function(token) {
-      document.getElementById('recaptchaToken').value = token;
+    // Ensure checkbox styles update properly when toggled
+    $('#terms_conditions').on('change', function () {
+      if (this.checked) {
+        this.style.accentColor = 'dodgerblue';
+      } else {
+        this.style.accentColor = 'gray';
+      }
     });
+
+    // Debugging tip: Ensure the loader ends properly
+    end_loader();
   });
 </script>
 
 <style>
   .login-logo {
-    width: 100px;
-    margin-bottom: 5px;
+    width: 100px; /* Adjust the width as needed */
+    margin-bottom: 5px; /* Adjust the spacing as needed */
     margin-top: 5px;
   }
   #toggle-password {
-    font-size: .8rem;
-    cursor: pointer;
+    font-size: .8rem; /* Adjust the size as needed */
+    cursor: pointer; /* Change cursor to pointer for better UX */
   }
   .btn-link {
-    color: #007bff;
+    color: #007bff; /* Bootstrap primary link color */
     text-decoration: none;
-    padding: 0;
+    padding: 0; /* Remove padding for a cleaner look */
   }
   .btn-link:hover {
-    text-decoration: underline;
+    text-decoration: underline; /* Underline on hover for better UX */
   }
 </style>
 

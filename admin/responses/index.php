@@ -126,48 +126,83 @@
     printWindow.document.write('<style>');
     printWindow.document.write(`
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Arial', sans-serif; 
             margin: 20px; 
+            line-height: 1.6;
+            color: #333;
         }
         .print-header {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
         }
         .print-header img {
-            max-width: 100px;
-            margin-right: 20px;
+            max-width: 120px;
+            margin-right: 30px;
         }
         .print-header-text {
             text-align: center;
         }
         .print-header-text h1 {
             margin: 0;
-            color: #333;
+            color: #000;
+            font-size: 24px;
         }
         .print-header-text p {
             margin: 5px 0 0;
             color: #666;
+            font-size: 14px;
         }
         table { 
             width: 100%; 
-            border-collapse: collapse; 
+            border-collapse: separate; 
+            border-spacing: 0;
             margin: 20px 0; 
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        thead {
+            background-color: #f2f2f2;
+            color: #000;
         }
         th, td { 
-            border: 1px solid black; 
-            padding: 8px; 
+            border: 1px solid #000; 
+            padding: 12px; 
             text-align: left; 
         }
-        th { 
-            background-color: #f2f2f2; 
+        th {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .truncate {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         @media print { 
             body { margin: 0; padding: 0; } 
-            table { page-break-inside: avoid; } 
+            table { 
+                page-break-inside: avoid; 
+                box-shadow: none;
+            }
+        }
+        .print-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 10px;
+            color: #666;
         }
     `);
     printWindow.document.write('</style>');
@@ -176,7 +211,7 @@
     // Enhanced header with logo and college name
     printWindow.document.write(`
         <div class="print-header">
-            <img src="logo.png" alt="Madridejos Community College">
+            <img src="logo.png" alt="Madridejos Community College Logo">
             <div class="print-header-text">
                 <h1>Madridejos Community College</h1>
                 <p>Responses List</p>
@@ -188,15 +223,11 @@
     
     // Add footer with date and page number
     printWindow.document.write(`
+        <div class="print-footer">
+            Generated on: ${new Date().toLocaleString()} | Page 1
+        </div>
         <script>
             window.onload = function() {
-                var date = new Date();
-                var footer = document.createElement('div');
-                footer.style.textAlign = 'center';
-                footer.style.marginTop = '20px';
-                footer.style.fontSize = '10px';
-                footer.innerHTML = 'Generated on: ' + date.toLocaleString() + ' | Page ' + (window.page || 1);
-                document.body.appendChild(footer);
                 window.print();
             }
         <\/script>

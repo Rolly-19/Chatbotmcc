@@ -122,7 +122,7 @@
 
     // Print the table without action column
     var tableHTML = table.outerHTML;
-    printWindow.document.write('<html><head><title>Print Table</title>');
+    printWindow.document.write('<html><head><title>MCC CHAT</title>');
     printWindow.document.write('<style>');
     printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
     printWindow.document.write('table { width: 100%; border-collapse: collapse; margin: 20px 0; }');
@@ -133,7 +133,7 @@
     printWindow.document.write('</style>');
     printWindow.document.write('</head><body>');
     printWindow.document.write('<div style="text-align: center;">');
-    printWindow.document.write('<img src="logo.png" alt="Logo" style="max-width: 150px; margin-bottom: 10px;">'); // Add logo URL and style it
+    printWindow.document.write('<img src="../logo.png" alt="Logo" style="max-width: 150px; margin-bottom: 10px;">'); // Add logo URL and style it
     printWindow.document.write('<h1>Madridejos Community College</h1>'); // Add a title to the print page
     printWindow.document.write('<p>Responses List</p>'); // Add a subtitle to the print page
     printWindow.document.write('</div>');

@@ -122,26 +122,88 @@
 
     // Print the table without action column
     var tableHTML = table.outerHTML;
-    printWindow.document.write('<html><head><title>MCC CHAT</title>');
+    printWindow.document.write('<html><head><title>MCC CHAT - Responses List</title>');
     printWindow.document.write('<style>');
-    printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
-    printWindow.document.write('table { width: 100%; border-collapse: collapse; margin: 20px 0; }');
-    printWindow.document.write('th, td { border: 1px solid black; padding: 8px; text-align: left; }');
-    printWindow.document.write('th { background-color: #f2f2f2; }');
-    printWindow.document.write('h1, p { text-align: center; margin: 0; padding: 0; }');
-    printWindow.document.write('@media print { body { margin: 0; padding: 0; } table { page-break-inside: avoid; } }');
+    printWindow.document.write(`
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+        }
+        .print-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .print-header img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .print-header-text {
+            text-align: center;
+        }
+        .print-header-text h1 {
+            margin: 0;
+            color: #333;
+        }
+        .print-header-text p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+        }
+        th, td { 
+            border: 1px solid black; 
+            padding: 8px; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #f2f2f2; 
+        }
+        @media print { 
+            body { margin: 0; padding: 0; } 
+            table { page-break-inside: avoid; } 
+        }
+    `);
     printWindow.document.write('</style>');
     printWindow.document.write('</head><body>');
-    printWindow.document.write('<div style="text-align: center;">');
-    printWindow.document.write('<img src="../logo.png" alt="Logo" style="max-width: 150px; margin-bottom: 10px;">'); // Add logo URL and style it
-    printWindow.document.write('<h1>Madridejos Community College</h1>'); // Add a title to the print page
-    printWindow.document.write('<p>Responses List</p>'); // Add a subtitle to the print page
-    printWindow.document.write('</div>');
+    
+    // Enhanced header with logo and college name
+    printWindow.document.write(`
+        <div class="print-header">
+            <img src="logo.png" alt="Madridejos Community College">
+            <div class="print-header-text">
+                <h1>Madridejos Community College</h1>
+                <p>Responses List</p>
+            </div>
+        </div>
+    `);
+    
     printWindow.document.write(tableHTML);
+    
+    // Add footer with date and page number
+    printWindow.document.write(`
+        <script>
+            window.onload = function() {
+                var date = new Date();
+                var footer = document.createElement('div');
+                footer.style.textAlign = 'center';
+                footer.style.marginTop = '20px';
+                footer.style.fontSize = '10px';
+                footer.innerHTML = 'Generated on: ' + date.toLocaleString() + ' | Page ' + (window.page || 1);
+                document.body.appendChild(footer);
+                window.print();
+            }
+        <\/script>
+    `);
+    
     printWindow.document.write('</body></html>');
     printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
 }
 
 

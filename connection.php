@@ -12,24 +12,20 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Define the new user values
-$firstname = "Rolly";
-$lastname = "Recabar";
-$username = "recabarrolly@gmail.com";
-$password = password_hash("rollyrecabar", PASSWORD_BCRYPT); // Securely hash the password
-$otp = "";
-$phone = "09631064348";
-$avatar = NULL; // Optional: Set to NULL if no avatar
-$dateAdded = date("Y-m-d H:i:s");
+// Create feedback table
+$createFeedbackTable = "CREATE TABLE IF NOT EXISTS feedback (
+    id int(11) NOT NULL AUTO_INCREMENT,
+    feedback text NOT NULL,
+    rating int(1) NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    date_submitted datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
-// Insert the user into the database
-$sql = "INSERT INTO users (firstname, lastname, username, password, OTP, phone, avatar, date_added) 
-        VALUES ('$firstname', '$lastname', '$username', '$password', '$otp', '$phone', '$avatar', '$dateAdded')";
-
-if ($conn->query($sql) === TRUE) {
-    echo "New user added successfully!";
+// Execute create table query
+if ($conn->query($createFeedbackTable) === TRUE) {
+    echo "Feedback table created successfully!";
 } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "Error creating feedback table: " . $conn->error;
 }
 
 // Close the connection

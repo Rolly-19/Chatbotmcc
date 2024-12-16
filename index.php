@@ -20,7 +20,7 @@
     left: auto;
     right: 0px; /* Fixed to the right side */
     transform: translate(50%, 0px) rotate(-90deg); /* Rotate into position */
-    background: rgb(159, 239, 0) !important; /* Greenish background */
+    background: #FF5555 !important; /* Greenish background */
     color: rgb(2, 2, 0) !important; /* Black text color */
     fill: rgb(2, 2, 0) !important; /* For SVG or icons inside */
     z-index: 1000; /* Ensure it’s above other content */
@@ -29,7 +29,7 @@
 
 /* Hover Effect */
 #feedback_button:hover {
-    background: rgb(135, 202, 0) !important; /* Darker green on hover */
+    background: #FF3C3C !important; /* Darker green on hover */
     color: rgb(2, 2, 0) !important; /* Retain black text color */
     fill: rgb(2, 2, 0) !important;
 }

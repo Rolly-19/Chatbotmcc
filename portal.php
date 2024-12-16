@@ -161,6 +161,40 @@
   </div>
 </div>
 
+<div class="modal fade" id="feedback_modal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="feedbackModalLabel">Submit Your Feedback</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="feedback_form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="feedback_text">Your Feedback</label>
+            <textarea class="form-control" id="feedback_text" name="feedback_text" rows="3" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="rating">Rating</label>
+            <select class="form-control" id="rating" name="rating" required>
+			<option value="5">😍 - Excellent</option>
+			<option value="4">😊 - Good</option>
+			<option value="3">😐 - Average</option>
+			<option value="2">🙁 - Poor</option>
+			<option value="1">😢 - Very Poor</option>
+			</select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <div class="d-none" id="user_chat">
   <div class="direct-chat-msg right ml-4" data-aos="fade-right" data-aos-duration="1000">
     <img class="direct-chat-img border-1 border-primary" src="<?php echo validate_image($_settings->info('user_avatar')) ?>" alt="message user image">

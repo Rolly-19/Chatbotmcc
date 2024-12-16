@@ -147,3 +147,106 @@
     });
   })
 </script>
+
+<!-- Feedback Dashboard -->
+<div class="card card-success">
+  <div class="card-header">
+    <h3 class="card-title">Feedback Overview</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <?php
+    // Fetch recent feedback
+    $feedbacks = $conn->query("SELECT feedback, rating, date_submitted FROM `feedback` ORDER BY date_submitted DESC LIMIT 10");
+    $ratings = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0]; // Rating distribution
+    $recent_feedback = [];
+    while ($row = $feedbacks->fetch_assoc()) {
+        $ratings[$row['rating']]++;
+        $recent_feedback[] = $row;
+    }
+    ?>
+    
+    <!-- Feedback Ratings Chart -->
+    <div class="chart">
+      <canvas id="feedbackPieChart"></canvas>
+    </div>
+
+    <!-- Feedback Table -->
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Rating</th>
+          <th>Feedback</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($recent_feedback as $feedback): ?>
+        <tr>
+          <td><?php echo $feedback['date_submitted']; ?></td>
+          <td>
+            <?php
+            switch ($feedback['rating']) {
+                case 5: echo '😍'; break;
+                case 4: echo '😊'; break;
+                case 3: echo '😐'; break;
+                case 2: echo '🙁'; break;
+                case 1: echo '😢'; break;
+            }
+            ?>
+          </td>
+          <td><?php echo htmlspecialchars($feedback['feedback']); ?></td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    // Bar Chart for Questions
+    var barChartCanvas = $('#barChart').get(0).getContext('2d');
+    var barChartData = {
+      labels: ['<?php echo implode("','", $label); ?>'],
+      datasets: [{
+        label: 'Frequent Asks',
+        backgroundColor: 'rgba(60,141,188,0.9)',
+        borderColor: 'rgba(60,141,188,1)',
+        data: [<?php echo implode(',', $data); ?>]
+      }]
+    };
+    var barChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false
+    };
+    new Chart(barChartCanvas, {
+      type: 'bar',
+      data: barChartData,
+      options: barChartOptions
+    });
+
+    // Pie Chart for Feedback
+    var pieChartCanvas = $('#feedbackPieChart').get(0).getContext('2d');
+    var pieData = {
+      labels: ['😢1', '🙁2', '😐3', '😊4', '😍5'],
+      datasets: [{
+        data: [<?php echo implode(',', $ratings); ?>],
+        backgroundColor: ['#ff6b6b', '#feca57', '#ff9ff3', '#1dd1a1', '#54a0ff']
+      }]
+    };
+    var pieOptions = {
+      responsive: true,
+      maintainAspectRatio: false
+    };
+    new Chart(pieChartCanvas, {
+      type: 'pie',
+      data: pieData,
+      options: pieOptions
+    });
+  });
+</script>

@@ -1,4 +1,4 @@
-<h1>Welcome to <?php echo $_settings->info('name') ?></h1>
+<h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">Welcome to <?php echo $_settings->info('name') ?></h1>
 <hr>
 <!-- BAR CHART -->
 <div class="card card-info">

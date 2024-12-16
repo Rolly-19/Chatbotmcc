@@ -9,10 +9,12 @@
   </script>
 <div class="login-box">
   <div class="card card-outline card-primary">
-    <div class="card-header text-center">
-      <img src="logo.png" alt="Logo" class="login-logo">
-      <a href="./" class="h1"><b>Login</b></a>
-    </div>
+  <div class="card-header text-center">
+  <div class="login-logo-container">
+    <img src="logo.png" alt="Logo" class="login-logo">
+    <a href="./" class="h1"><b>Login</b></a>
+  </div>
+</div>
     <div class="card-body">
       <p class="login-box-msg">Sign in to start your session</p>
 
@@ -158,22 +160,41 @@
 </script>
 
 <style>
-  .login-logo {
-    width: 100px; /* Adjust the width as needed */
-    margin-bottom: 5px; /* Adjust the spacing as needed */
-    margin-top: 5px;
-  }
+
+  .login-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-logo {
+  width: 50px; /* Adjust the size to your preference */
+  height: auto;
+  margin-right: 10px; /* Space between the logo and text */
+}
+
+.h1 {
+  text-decoration: none;
+  font-size: 1.5rem; /* Adjust the font size as needed */
+}
+
+  /* Keep your other existing styles */
   #toggle-password {
-    font-size: .8rem; /* Adjust the size as needed */
-    cursor: pointer; /* Change cursor to pointer for better UX */
+    font-size: .8rem;
+    cursor: pointer;
   }
+  
   .btn-link {
-    color: #007bff; /* Bootstrap primary link color */
+    color: #007bff;
     text-decoration: none;
-    padding: 0; /* Remove padding for a cleaner look */
+    padding: 0;
   }
+  
   .btn-link:hover {
-    text-decoration: underline; /* Underline on hover for better UX */
+    text-decoration: underline;
+  }
+  .h1{
+    text-decoration:none;
   }
 </style>
 

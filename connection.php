@@ -1,27 +1,33 @@
 <?php
-$servername = "localhost";
-$username = "u510162695_chatbot_db";
-$password = "1Chatbot_db";
-$dbname = "u510162695_chatbot_db";
-
-// Establish a MySQLi connection
+// Database connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection status
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Delete all rows from the unanswered table
-$deleteQuery = "DELETE FROM unanswered";
+// Prepare the data to be inserted
+$question = "What is the weather like today?"; // Example question
+$no_asks = 3; // Example number of asks
+$ask_date = '2024-12-16'; // Date in MySQL format (YYYY-MM-DD)
 
-// Execute the DELETE query
-if ($conn->query($deleteQuery) === TRUE) {
-    echo "All data has been deleted from the unanswered table.<br>";
+// Insert query with date field
+$insertQuery = "INSERT INTO unanswered (question, no_asks, ask_date) VALUES (?, ?, ?)";
+
+// Prepare and bind statement
+$stmt = $conn->prepare($insertQuery);
+$stmt->bind_param("sis", $question, $no_asks, $ask_date); 
+// "sis" means string for question, integer for no_asks, and string for ask_date
+
+// Execute the statement
+if ($stmt->execute()) {
+    echo "New record inserted successfully.";
 } else {
-    echo "Error deleting data: " . $conn->error . "<br>";
+    echo "Error inserting record: " . $stmt->error;
 }
 
-// Close the connection
+// Close the statement and connection
+$stmt->close();
 $conn->close();
 ?>

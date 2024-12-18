@@ -115,9 +115,9 @@ class Master extends DBConnection {
             // Check and insert into unanswered questions
             $chk = $this->conn->query("SELECT * FROM `unanswered` WHERE `question` = '{$message}' ");
             if ($chk->num_rows > 0) {
-                $this->conn->query("UPDATE `unanswered` SET no_asks = no_asks + 1 WHERE question = '{$message}' ");
+                $this->conn->query("UPDATE `unanswered` SET no_asks = no_asks + 1, date = NOW() WHERE question = '{$message}' ");
             } else {
-                $this->conn->query("INSERT INTO `unanswered` SET question = '{$message}', no_asks = 1 ");
+                $this->conn->query("INSERT INTO `unanswered` SET question = '{$message}', no_asks = 1, date = NOW() ");
             }
             return json_encode($resp);
         }

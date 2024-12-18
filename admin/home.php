@@ -240,17 +240,14 @@
     // Fetch daily prompt data
     function getDailyPromptsTrend($conn) {
       try {
-          // Get current date for reference
-          $current_date = date('Y-m-d');
+          // Fetch all unanswered prompts grouped by their date
+          $query = "
+              SELECT DATE(date) as prompt_date, COUNT(*) as total_prompts
+              FROM unanswered
+              GROUP BY DATE(date)
+              ORDER BY DATE(date) ASC
+          ";
           
-          // Fetch all unanswered prompts
-          $query = "SELECT id, question, no_asks, 
-                   DATE(NOW()) as prompt_date,
-                   COUNT(*) as total_prompts
-                   FROM unanswered 
-                   GROUP BY DATE(NOW())
-                   ORDER BY no_asks DESC";
-                   
           $result = $conn->query($query);
           
           if (!$result) {
@@ -260,57 +257,37 @@
           // Initialize arrays for chart data
           $dates = array();
           $counts = array();
-          $questions = array();
-          
+  
           // Process the results
           while ($row = $result->fetch_assoc()) {
               $dates[] = $row['prompt_date'];
               $counts[] = $row['total_prompts'];
-              $questions[] = array(
-                  'id' => $row['id'],
-                  'question' => $row['question'],
-                  'asks' => $row['no_asks']
-              );
           }
-          
-          // Calculate total prompts
-          $total_prompts = array_sum($counts);
-          
+  
           return array(
               'status' => 'success',
               'dates' => $dates,
-              'counts' => $counts,
-              'questions' => $questions,
-              'total_prompts' => $total_prompts,
-              'date_generated' => $current_date
+              'counts' => $counts
           );
-          
+  
       } catch (Exception $e) {
           return array(
               'status' => 'error',
-              'message' => $e->getMessage(),
-              'date' => date('Y-m-d H:i:s')
+              'message' => $e->getMessage()
           );
       }
   }
   
-  // Usage in your dashboard page:
+  // Fetch trend data
   $trend_data = getDailyPromptsTrend($conn);
   
   if ($trend_data['status'] === 'success') {
-      // For the line chart
       $dates = $trend_data['dates'];
       $counts = $trend_data['counts'];
-      
-      // Display total prompts
-      $total_prompts = $trend_data['total_prompts'];
-      
-      // Get questions data for potential use
-      $questions = $trend_data['questions'];
   } else {
-      // Handle error
       echo "Error: " . $trend_data['message'];
   }
+  
     ?>
     
     <!-- Display Total Prompts -->

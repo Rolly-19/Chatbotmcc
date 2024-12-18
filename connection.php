@@ -12,33 +12,15 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch data from the unanswered table
-$selectUnanswered = "SELECT * FROM unanswered";
+// Insert a value into the unanswered table
+$insertUnanswered = "INSERT INTO unanswered (id, question, no_asks, date)
+                     VALUES (1, 'What is PHP?', 5, '2024-12-17 00:00:00')";
 
-// Execute the SELECT query
-$result = $conn->query($selectUnanswered);
-
-if ($result->num_rows > 0) {
-    // Output the table headers
-    echo "<table border='1'>
-            <tr>";
-    // Fetch field names for table headers dynamically
-    while ($field = $result->fetch_field()) {
-        echo "<th>" . $field->name . "</th>";
-    }
-    echo "</tr>";
-
-    // Output each row of the table
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr>";
-        foreach ($row as $value) {
-            echo "<td>" . htmlspecialchars($value) . "</td>";
-        }
-        echo "</tr>";
-    }
-    echo "</table>";
+// Execute the INSERT query
+if ($conn->query($insertUnanswered) === TRUE) {
+    echo "New record inserted successfully.<br>";
 } else {
-    echo "No data found in the unanswered table.<br>";
+    echo "Error inserting record: " . $conn->error . "<br>";
 }
 
 // Close the connection

@@ -12,14 +12,35 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Alter unanswered table to add a datetime column
-$alterUnansweredTable = "ALTER TABLE unanswered ADD COLUMN date datetime NOT NULL DEFAULT CURRENT_TIMESTAMP";
+// Describe the unanswered table
+$describeUnansweredTable = "DESCRIBE unanswered";
 
-// Execute alter table query
-if ($conn->query($alterUnansweredTable) === TRUE) {
-    echo "Unanswered table altered successfully!<br>";
+// Execute describe table query
+$result = $conn->query($describeUnansweredTable);
+
+if ($result->num_rows > 0) {
+    echo "<table border='1'>
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Null</th>
+                <th>Key</th>
+                <th>Default</th>
+                <th>Extra</th>
+            </tr>";
+    while ($row = $result->fetch_assoc()) {
+        echo "<tr>
+                <td>" . $row['Field'] . "</td>
+                <td>" . $row['Type'] . "</td>
+                <td>" . $row['Null'] . "</td>
+                <td>" . $row['Key'] . "</td>
+                <td>" . $row['Default'] . "</td>
+                <td>" . $row['Extra'] . "</td>
+              </tr>";
+    }
+    echo "</table>";
 } else {
-    echo "Error altering unanswered table: " . $conn->error . "<br>";
+    echo "No table structure found or an error occurred.<br>";
 }
 
 // Close the connection

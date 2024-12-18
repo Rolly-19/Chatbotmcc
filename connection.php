@@ -4,43 +4,33 @@ $username = "u510162695_chatbot_db";
 $password = "1Chatbot_db";
 $dbname = "u510162695_chatbot_db";
 
-// Establish a MySQLi connection
-$conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection status
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch data from the unanswered table
-$selectUnanswered = "SELECT * FROM unanswered";
+// Prepare the data to be inserted
+$question = "What is the weather like today?"; // Example question
+$no_asks = 3; // Example number of asks
+$ask_date = '2024-12-16'; // Date in MySQL format (YYYY-MM-DD)
 
-// Execute the SELECT query
-$result = $conn->query($selectUnanswered);
+// Insert query with date field
+$insertQuery = "INSERT INTO unanswered (question, no_asks, ask_date) VALUES (?, ?, ?)";
 
-if ($result->num_rows > 0) {
-    // Output the table headers
-    echo "<table border='1'>
-            <tr>";
-    // Fetch field names for table headers dynamically
-    while ($field = $result->fetch_field()) {
-        echo "<th>" . $field->name . "</th>";
-    }
-    echo "</tr>";
+// Prepare and bind statement
+$stmt = $conn->prepare($insertQuery);
+$stmt->bind_param("sis", $question, $no_asks, $ask_date); 
+// "sis" means string for question, integer for no_asks, and string for ask_date
 
-    // Output each row of the table
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr>";
-        foreach ($row as $value) {
-            echo "<td>" . htmlspecialchars($value) . "</td>";
-        }
-        echo "</tr>";
-    }
-    echo "</table>";
+// Execute the statement
+if ($stmt->execute()) {
+    echo "New record inserted successfully.";
 } else {
-    echo "No data found in the unanswered table.<br>";
+    echo "Error inserting record: " . $stmt->error;
 }
 
-// Close the connection
+// Close the statement and connection
+$stmt->close();
 $conn->close();
 ?>

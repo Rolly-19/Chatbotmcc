@@ -124,6 +124,9 @@
       <button type="button" class="btn btn-tool" data-card-widget="collapse">
         <i class="fas fa-minus"></i>
       </button>
+      <button type="button" class="btn btn-tool" data-card-widget="remove">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
   </div>
   <div class="card-body">
@@ -217,4 +220,155 @@
       options: pieOptions
     });
   });
+</script>
+
+<!-- LINE GRAPH -->
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title">Daily Prompts Trend</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
+      <button type="button" class="btn btn-tool" data-card-widget="remove">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <?php
+    // Fetch daily prompt data
+    function getDailyPromptsTrend($conn) {
+      try {
+          // Get current date for reference
+          $current_date = date('Y-m-d');
+          
+          // Fetch all unanswered prompts
+          $query = "SELECT id, question, no_asks, 
+                   DATE(NOW()) as prompt_date,
+                   COUNT(*) as total_prompts
+                   FROM unanswered 
+                   GROUP BY DATE(NOW())
+                   ORDER BY no_asks DESC";
+                   
+          $result = $conn->query($query);
+          
+          if (!$result) {
+              throw new Exception("Query failed: " . $conn->error);
+          }
+  
+          // Initialize arrays for chart data
+          $dates = array();
+          $counts = array();
+          $questions = array();
+          
+          // Process the results
+          while ($row = $result->fetch_assoc()) {
+              $dates[] = $row['prompt_date'];
+              $counts[] = $row['total_prompts'];
+              $questions[] = array(
+                  'id' => $row['id'],
+                  'question' => $row['question'],
+                  'asks' => $row['no_asks']
+              );
+          }
+          
+          // Calculate total prompts
+          $total_prompts = array_sum($counts);
+          
+          return array(
+              'status' => 'success',
+              'dates' => $dates,
+              'counts' => $counts,
+              'questions' => $questions,
+              'total_prompts' => $total_prompts,
+              'date_generated' => $current_date
+          );
+          
+      } catch (Exception $e) {
+          return array(
+              'status' => 'error',
+              'message' => $e->getMessage(),
+              'date' => date('Y-m-d H:i:s')
+          );
+      }
+  }
+  
+  // Usage in your dashboard page:
+  $trend_data = getDailyPromptsTrend($conn);
+  
+  if ($trend_data['status'] === 'success') {
+      // For the line chart
+      $dates = $trend_data['dates'];
+      $counts = $trend_data['counts'];
+      
+      // Display total prompts
+      $total_prompts = $trend_data['total_prompts'];
+      
+      // Get questions data for potential use
+      $questions = $trend_data['questions'];
+  } else {
+      // Handle error
+      echo "Error: " . $trend_data['message'];
+  }
+    ?>
+    
+    <!-- Display Total Prompts -->
+    <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">
+      Total Prompts: <?php echo array_sum($counts); ?>
+    </div>
+    
+    <!-- Line Chart -->
+    <div class="chart">
+      <canvas id="lineChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function() {
+    // Line Chart Data
+    var lineChartData = {
+        labels: ['<?php echo implode("','", $dates); ?>'],
+        datasets: [{
+            label: 'Daily Prompts',
+            backgroundColor: 'rgba(60,141,188,0.3)',
+            borderColor: 'rgba(60,141,188,1)',
+            pointRadius: 5,
+            pointColor: '#3b8bba',
+            pointStrokeColor: 'rgba(60,141,188,1)',
+            pointHighlightFill: '#fff',
+            pointHighlightStroke: 'rgba(60,141,188,1)',
+            data: [<?php echo implode(',', $counts); ?>]
+        }]
+    };
+
+    // Use your existing chart options and initialization
+    var lineChartOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+        legend: {
+            display: true
+        },
+        scales: {
+            xAxes: [{
+                gridLines: {
+                    display: false,
+                }
+            }],
+            yAxes: [{
+                gridLines: {
+                    display: false,
+                }
+            }]
+        }
+    };
+
+    var lineChartCanvas = $('#lineChart').get(0).getContext('2d');
+    new Chart(lineChartCanvas, {
+        type: 'line',
+        data: lineChartData,
+        options: lineChartOptions
+    });
+});
 </script>

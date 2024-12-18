@@ -1,6 +1,9 @@
 <?php
-// Database connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$servername = "localhost";
+$username = "u510162695_chatbot_db";
+$password = "1Chatbot_db";
+$dbname = "u510162695_chatbot_db";
+
 
 // Check connection
 if ($conn->connect_error) {

@@ -132,7 +132,7 @@
   <div class="card-body">
     <?php
     // Fetch recent feedback
-    $feedbacks = $conn->query("SELECT feedback, rating, date_submitted FROM `feedback` ORDER BY date_submitted DESC LIMIT 10");
+    $feedbacks = $conn->query("SELECT feedback, rating, date_submitted FROM `feedback` ORDER BY date_submitted DESC LIMIT 50"); // Fetch more rows for pagination
     $ratings = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0]; // Rating distribution
     $recent_feedback = [];
     while ($row = $feedbacks->fetch_assoc()) {
@@ -140,14 +140,14 @@
         $recent_feedback[] = $row;
     }
     ?>
-    
+
     <!-- Feedback Ratings Chart -->
-    <div class="chart">
+    <div class="chart mb-4">
       <canvas id="feedbackPieChart"></canvas>
     </div>
 
     <!-- Feedback Table -->
-    <table class="table table-striped mt-4">
+    <table id="feedbackTable" class="table table-striped table-bordered mt-4">
       <thead>
         <tr>
           <th>Date</th>
@@ -179,26 +179,15 @@
 </div>
 
 <script>
-  $(function() {
-    // Bar Chart for Questions
-    var barChartCanvas = $('#barChart').get(0).getContext('2d');
-    var barChartData = {
-      labels: ['<?php echo implode("','", $label); ?>'],
-      datasets: [{
-        label: 'Frequent Asks',
-        backgroundColor: 'rgba(60,141,188,0.9)',
-        borderColor: 'rgba(60,141,188,1)',
-        data: [<?php echo implode(',', $data); ?>]
-      }]
-    };
-    var barChartOptions = {
-      responsive: true,
-      maintainAspectRatio: false
-    };
-    new Chart(barChartCanvas, {
-      type: 'bar',
-      data: barChartData,
-      options: barChartOptions
+  $(document).ready(function() {
+    // Initialize DataTables without search
+    $('#feedbackTable').DataTable({
+      pageLength: 10, // Display 10 rows per page
+      lengthMenu: [5, 10, 15, 20], // Options for rows per page
+      ordering: false, // Disable column ordering
+      searching: false, // Disable the search box
+      info: true, // Show information about current page and entries
+      paging: true, // Enable pagination
     });
 
     // Pie Chart for Feedback

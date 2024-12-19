@@ -48,65 +48,21 @@
 	</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
-    let userId = $('#userId').val();
-    if (userId) {
-        $.ajax({
-            url: _base_url_ + "classes/Adduser.php?f=get_user",
-            method: 'POST',
-            data: { id: userId },
-            dataType: 'json',
-            success: function(response) {
-                console.log("Response received:", response); // Debugging
-
-                if (response.status === 'success') {
-                    const user = response.data;
-                    $('#firstname').val(user.firstname);
-                    $('#lastname').val(user.lastname);
-                    $('#username').val(user.username);
-                    $('#phone').val(user.phone);
-                    if (user.avatar) {
-                        $('#cimg').attr('src', _base_url_ + user.avatar);
-                    }
-                } else {
-                    alert_toast(response.message || "Error loading user data", 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX error:", error);
-                console.error(xhr.responseText); // Debug response
-                alert_toast("An error occurred while fetching user data", 'error');
-            }
-        });
-    }
-
-
-    // Function to format date
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-    }
-
     // Function to load users
     function loadUsers() {
         $.ajax({
-            url: _base_url_+"classes/Adduser.php?f=fetch",
+            url: _base_url_ + "classes/Adduser.php?f=fetch&timestamp=" + new Date().getTime(),
             method: 'GET',
             dataType: 'json',
-            cache: false,
+            cache: false, // Ensure fresh data
             success: function(response) {
-                console.log('AJAX Response:', response);  // Log the full response
-
-                if(response.status === 'success' && response.data) {
+                if (response.status === 'success' && response.data) {
                     let tbody = $('#userTableBody');
                     tbody.html(''); // Clear existing rows
-                    
+
                     response.data.forEach(function(user) {
                         let avatarUrl = _base_url_ + (user.avatar || 'uploads/default.png');
                         let row = `
@@ -144,8 +100,13 @@ $(document).ready(function() {
                         tbody.append(row);
                     });
 
-                    // Initialize or refresh DataTable
-                    if (!$.fn.DataTable.isDataTable('#userTable')) {
+                    // Use DataTable API for better lifecycle management
+                    if ($.fn.DataTable.isDataTable('#userTable')) {
+                        let dataTable = $('#userTable').DataTable();
+                        dataTable.clear();
+                        dataTable.rows.add(tbody.find('tr'));
+                        dataTable.draw();
+                    } else {
                         $('#userTable').DataTable({
                             "responsive": true,
                             "lengthChange": false,
@@ -156,101 +117,94 @@ $(document).ready(function() {
                                 { "orderable": false, "targets": [1, 6] } // Disable sorting for avatar and actions columns
                             ]
                         });
-                    } else {
-                        $('#userTable').DataTable().draw();
                     }
 
-                    // Add click event for delete button
-                    $('.delete_user').click(function() {
-                        const userId = $(this).data('id');
-                        
-                        // SweetAlert confirmation dialog
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: "You won't be able to revert this!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, delete it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $.ajax({
-                                    url: _base_url_ + "classes/Adduser.php?f=delete&id=" + userId,
-                                    method: 'GET',
-                                    success: function(response) {
-                                        if (response == 1) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Deleted!',
-                                                text: 'User has been deleted successfully.',
-                                                timer: 2000,
-                                                timerProgressBar: true
-                                            });
-                                            loadUsers(); // Reload the user table
-                                        } else if (response == 2) {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Error',
-                                                text: 'An error occurred while deleting the user'
-                                            });
-                                        } else if (response == 3) {
-                                            Swal.fire({
-                                                icon: 'warning',
-                                                title: 'Not Found',
-                                                text: 'User not found'
-                                            });
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Unknown Error',
-                                                text: 'An unknown error occurred'
-                                            });
-                                        }
-                                    },
-                                    error: function(xhr, status, error) {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error',
-                                            text: 'Error deleting user'
-                                        });
-                                        console.error("AJAX Error: ", error);
-                                    }
-                                });
-                            }
-                        });
-                    });
+                    attachDeleteEventHandlers(); // Reattach event handlers
                 } else {
-                    console.error('Error in response:', response);
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error',
-                        text: "Error loading users: " + (response.message || 'Unknown error')
+                        title: 'Error loading users',
+                        text: response.message || 'Unknown error',
+                        confirmButtonText: 'Okay'
                     });
                 }
             },
-            error: function(xhr, status, error) {
-                console.log('AJAX Error:', xhr.responseText, status, error);
-
-                let errorMessage = 'An error occurred while fetching users';
-                try {
-                    let response = JSON.parse(xhr.responseText);
-                    errorMessage = response.message || errorMessage;
-                } catch(e) {
-                    errorMessage += ': ' + xhr.responseText.substring(0, 100);
-                }
+            error: function(xhr) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: errorMessage
+                    text: 'An error occurred while fetching users',
+                    confirmButtonText: 'Okay'
                 });
             }
+        });
+    }
+
+    // Function to attach delete event handlers
+    function attachDeleteEventHandlers() {
+        $('.delete_user').off('click').on('click', function() {
+            const userId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: _base_url_ + "classes/Adduser.php?f=delete&id=" + userId,
+                        method: 'GET',
+                        success: function(response) {
+                            if (response == 1) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'User has been deleted.',
+                                    confirmButtonText: 'Okay'
+                                });
+                                loadUsers(); // Reload the user table
+                            } else if (response == 2) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'An error occurred while deleting the user.',
+                                    confirmButtonText: 'Okay'
+                                });
+                            } else if (response == 3) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Not Found',
+                                    text: 'User not found.',
+                                    confirmButtonText: 'Okay'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Unknown Error',
+                                    text: 'An unknown error occurred.',
+                                    confirmButtonText: 'Okay'
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error deleting user.',
+                                confirmButtonText: 'Okay'
+                            });
+                        }
+                    });
+                }
+            });
         });
     }
 
     // Load users when page loads
     loadUsers();
 });
-
-
 </script>

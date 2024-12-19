@@ -66,43 +66,45 @@
 
 <script>
   $(function() {
-   
+    // Bar Chart Data
+    var barChartData = {
+      labels: <?php echo json_encode($label); ?>, // Top 10 question labels
+      datasets: [{
+        label: 'Frequent Asks',
+        backgroundColor: 'rgba(60,141,188,0.9)',
+        borderColor: 'rgba(60,141,188,1)',
+        data: <?php echo json_encode($data); ?> // Corresponding data
+      }]
+    };
+
     // Bar Chart Options
     var barChartOptions = {
-      maintainAspectRatio : false,
-      responsive : true,
-      legend: {
-        display: false
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        },
+        datalabels: {
+          display: false
+        }
       },
       scales: {
-        xAxes: [{
-          gridLines : {
-            display : false,
+        x: {
+          grid: {
+            display: false
           }
-        }],
-        yAxes: [{
-          gridLines : {
-            display : false,
+        },
+        y: {
+          grid: {
+            display: false
           }
-        }]
-      },
-      plugins: {
-        datalabels: {
-          display: false,
         }
       },
       layout: {
         padding: {
-          bottom: 20,
+          bottom: 20
         }
-      },
-      beforeDraw: function(chart) {
-        var ctx = chart.ctx;
-        var img = new Image();
-        img.src = 'path/to/your/image.png';  // Replace with your image path
-        img.onload = function() {
-          ctx.drawImage(img, 0, 0, chart.width, chart.height);
-        };
       }
     };
 
@@ -113,8 +115,9 @@
       data: barChartData,
       options: barChartOptions
     });
-  })
+  });
 </script>
+
 
 <!-- Feedback Dashboard -->
 <div class="card card-success">
